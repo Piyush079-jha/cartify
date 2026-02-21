@@ -3,7 +3,9 @@ const productModel = require("../../models/productModel")
 const getCategoryWiseProduct = async(req,res)=>{
     try{
         const { category } = req?.body || req?.query
-        const product = await productModel.find({ category })
+        const product = await productModel.find({ 
+            category: { $regex: new RegExp(`^${category}$`, 'i') }
+        })
 
         res.json({
             data : product,

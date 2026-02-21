@@ -15,7 +15,6 @@ const SearchProduct = () => {
         const response = await fetch(SummaryApi.searchProduct.url+query.search)
         const dataResponse = await response.json()
         setLoading(false)
-
         setData(dataResponse.data)
     }
 
@@ -24,28 +23,31 @@ const SearchProduct = () => {
     },[query])
 
   return (
-    <div className='container mx-auto p-4'>
-      {
-        loading && (
-          <p className='text-lg text-center'>Loading ...</p>
-        )
-      }
- 
-      <p className='text-lg font-semibold my-3'>Search Results : {data.length}</p>
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 12px' }}>
+      <style>{`
+        @media (min-width: 640px) { .sp-wrap { padding: 16px 24px !important; } }
+        @media (min-width: 1024px) { .sp-wrap { padding: 20px 32px !important; } }
+      `}</style>
 
-      {
-        data.length === 0 && !loading && (
-           <p className='bg-white text-lg text-center p-4'>No Data Found....</p>
-        )
-      }
+      {loading && (
+        <p style={{ fontSize: '18px', textAlign: 'center', padding: '40px 0', color: '#667eea' }}>
+          Loading ...
+        </p>
+      )}
 
+      <p style={{ fontSize: '16px', fontWeight: 600, margin: '12px 0' }}>
+        Search Results : {data.length}
+      </p>
 
-      {
-        data.length !==0 && !loading && (
-          <VerticalCard loading={ loading} data={data}/>
-        )
-      }
+      {data.length === 0 && !loading && (
+        <p style={{ background: '#fff', fontSize: '16px', textAlign: 'center', padding: '24px 16px', borderRadius: '12px' }}>
+          No Data Found....
+        </p>
+      )}
 
+      {data.length !== 0 && !loading && (
+        <VerticalCard loading={loading} data={data} />
+      )}
     </div>
   )
 }

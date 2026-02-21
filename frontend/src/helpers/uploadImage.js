@@ -1,18 +1,17 @@
-const url = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME_CLOUDINARY}/image/upload`
+const backendDomain = "http://localhost:8080"
 
-const uploadImage  = async(image) => {
+const uploadImage = async (image) => {
     const formData = new FormData()
-    formData.append("file",image)
-    formData.append("upload_preset","mern_product")
-    
+    formData.append('productImage', image)
 
-    const dataResponse = await fetch(url,{
-        method : "post",
-        body : formData
+    const response = await fetch(`${backendDomain}/api/upload-image`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData   
     })
 
-    return dataResponse.json()
-
+    const result = await response.json()
+    return result 
 }
 
-export default uploadImage 
+export default uploadImage

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const productSchema = mongoose.Schema({
     productName : String,
     brandName : String,
-    category : String,
+    category : { type: String, lowercase: true },
     productImage : [],
     description : String,
     price : Number,
@@ -11,7 +11,6 @@ const productSchema = mongoose.Schema({
 },{
     timestamps : true
 })
-
 
 const productModel = mongoose.model("product",productSchema)
 
