@@ -63,7 +63,7 @@ const rawProducts = [
     { productName: "Xiaomi Wireless Mouse 2", brandName: "Xiaomi", category: "mouse", productImage: ["/images/products/mouse/Xiaomi Wireless Mouse 2.jpg"], description: "1200 DPI, 2.4GHz wireless, 12 months battery, Silent click", price: 999, sellingPrice: 699 },
 
     // ==================== TELEVISIONS (10) ====================
-    { productName: "Samsung 55-inch Neo QLED 4K TV", brandName: "Samsung", category: "televisions", productImage: ["/images/products/TV/Samsung 55-inch Neo QLED 4k TV.jpg"], description: "Neo QLED, Quantum HDR 32x, Gaming Hub, Tizen OS", price: 119900, sellingPrice: 94900 },
+    { productName: "Samsung 55-inch Neo QLED 4K TV", brandName: "Samsung", category: "televisions", productImage: ["/images/products/TV/Realme 43-inch 4K Smart TV.jpg"], description: "Neo QLED, Quantum HDR 32x, Gaming Hub, Tizen OS", price: 119900, sellingPrice: 94900 },
     { productName: "LG OLED C3 65-inch", brandName: "LG", category: "televisions", productImage: ["/images/products/TV/LG OLED C3 65-inch.webp"], description: "OLED evo, α9 AI Processor, Dolby Vision IQ, G-Sync, FreeSync", price: 229900, sellingPrice: 189900 },
     { productName: "Sony Bravia XR 55 X90L", brandName: "Sony", category: "televisions", productImage: ["/images/products/TV/Sony Bravia XR 55 X90L.webp"], description: "Full Array LED, XR Processor, Dolby Vision & Atmos, Google TV", price: 139900, sellingPrice: 109900 },
     { productName: "Mi 43-inch 4K Smart TV", brandName: "Mi", category: "televisions", productImage: ["/images/products/TV/Mi 43-inch 4K Smart TV.jpg"], description: "4K Ultra HD, Android TV, Dolby Audio, 20W speaker", price: 32999, sellingPrice: 26999 },
