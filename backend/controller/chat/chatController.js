@@ -3,7 +3,6 @@ const productModel = require("../../models/productModel")
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
-// Cache product context for 5 minutes to save API quota
 let cachedContext = null
 let cacheTime = null
 
@@ -32,7 +31,7 @@ const chatController = async (req, res) => {
         const productContext = await getProductContext()
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
+           model: "gemini-pro",
             systemInstruction: `You are a helpful shopping assistant for Cartify, an e-commerce store selling electronics.
 
 Available products (with links):
