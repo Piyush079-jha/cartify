@@ -31,7 +31,7 @@ const chatController = async (req, res) => {
         const productContext = await getProductContext()
 
         const model = genAI.getGenerativeModel({
-           model: "gemini-1.5-flash-latest",
+         model: "gemini-1.5-flash-8b",
             systemInstruction: `You are a helpful shopping assistant for Cartify, an e-commerce store selling electronics.
 
 Available products (with links):
