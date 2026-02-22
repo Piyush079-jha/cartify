@@ -1,7 +1,7 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai")
+const Groq = require("groq-sdk")
 const productModel = require("../../models/productModel")
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 let cachedContext = null
 let cacheTime = null
@@ -30,9 +30,10 @@ const chatController = async (req, res) => {
 
         const productContext = await getProductContext()
 
-        const model = genAI.getGenerativeModel({
-         model: "gemini-1.5-flash-8b",
-            systemInstruction: `You are a helpful shopping assistant for Cartify, an e-commerce store selling electronics.
+        const messages = [
+            {
+                role: "system",
+                content: `You are a helpful shopping assistant for Cartify, an e-commerce store selling electronics.
 
 Available products (with links):
 ${productContext}
@@ -45,20 +46,24 @@ Store policies:
 
 IMPORTANT INSTRUCTIONS:
 - When recommending products, ALWAYS include their link in this exact format: [Product Name](/product/ID)
-- Example: I recommend the [Apple AirPods Pro 2nd Gen](/product/abc123) at ₹19,900
 - Always mention the price when recommending a product
 - Be friendly, concise and helpful. Max 3-4 sentences per response.
 - If multiple products match, list up to 3 with their links and prices.`
+            },
+            ...history.map(msg => ({
+                role: msg.role,
+                content: msg.text
+            })),
+            { role: "user", content: message }
+        ]
+
+        const completion = await groq.chat.completions.create({
+            model: "llama3-8b-8192",
+            messages: messages,
+            max_tokens: 500
         })
 
-        const chatHistory = history.map(msg => ({
-            role: msg.role,
-            parts: [{ text: msg.text }]
-        }))
-
-        const chat = model.startChat({ history: chatHistory })
-        const result = await chat.sendMessage(message)
-        const response = result.response.text()
+        const response = completion.choices[0].message.content
 
         res.json({ success: true, message: response })
 
