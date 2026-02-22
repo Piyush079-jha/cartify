@@ -10,7 +10,7 @@ const router = require("./routes");
 const app = express();
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://cartifyy-orpin.vercel.app'],
     credentials: true
 }));
 app.use(express.json({ limit: '10mb' }))
