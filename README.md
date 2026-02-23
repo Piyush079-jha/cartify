@@ -2,7 +2,7 @@
 
 Cartify is a full-stack e-commerce app I built using the MERN stack. It has everything you'd expect from a real shopping platform — browsing products, adding to cart, wishlist, payments, and even an AI shopping assistant powered by Google Gemini.
 
-🔗 **Live Demo:** [cartify.vercel.app](https://full-stack-e-commerce-mern-app.vercel.app)
+🔗 **Live Demo:** https://cartifyy-orpin.vercel.app/
 
 ---
 
