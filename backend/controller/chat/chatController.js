@@ -12,12 +12,12 @@ const getProductContext = async () => {
   }
   const products = await productModel
     .find({})
-    .limit(100)
-    .select("_id productName brandName category sellingPrice");
+    .limit(50)
+    .select("_id productName category sellingPrice");
   cachedContext = products
     .map(
       (p) =>
-        `- [${p.productName}](/product/${p._id}) by ${p.brandName} | Category: ${p.category} | Price: ₹${p.sellingPrice}`,
+        `- [${p.productName}](/product/${p._id}) | Category: ${p.category} | Price: ₹${p.sellingPrice}`
     )
     .join("\n");
   cacheTime = Date.now();
@@ -39,24 +39,30 @@ const chatController = async (req, res) => {
     const messages = [
       {
         role: "system",
-        content: `You are a helpful shopping assistant for Cartify, an e-commerce store selling electronics.
+        content: `You are Cartify's friendly shopping assistant for electronics.
 
-Available products (with links):
+Products:
 ${productContext}
 
-Store policies:
-- Free delivery on orders above ₹999
-- Easy 7-day returns
-- Secure payment methods
-- Cash on delivery available
+Policies: Free delivery above ₹999, 7-day returns, COD available.
 
-IMPORTANT INSTRUCTIONS:
-- When recommending products, ALWAYS include their link in this exact format: [Product Name](/product/ID)
-- Always mention the price when recommending a product
-- Be friendly, concise and helpful. Max 3-4 sentences per response.
-- If asked who designed or created Carify, say it was designed by Piyush Jha.
-- Always respond to greetings like "hi", "hello", "hey" warmly and introduce yourself
-- If multiple products match, list up to 3 with their links and prices.`,
+Rules:
+- Recommend products with links: [Name](/product/ID) and price
+- Max 2-3 sentences per response
+- If asked who made Cartify: Piyush Jha
+
+Also handle these naturally:
+- Greetings (hi/hello/hey) → greet warmly and introduce yourself
+- How are you → say you're doing great and ready to help
+- What can you do → explain you help find products, answer questions
+- Thank you → respond warmly
+- Bye/goodbye → wish them well
+- Jokes → tell a short fun tech/shopping joke
+- What is Cartify → explain it's an electronics e-commerce store
+- Compliments → accept gracefully and offer to help
+- Who made Cartify → Piyush Jha
+- Who is Piyush's wife → say "Piyush Jha's wife is Bhabya Jha 💕"
+- Random questions → politely say you're specialized for shopping but still try to help`,
       },
       ...history
         .filter((msg) => msg.role === "user" || msg.role === "assistant")
@@ -68,9 +74,9 @@ IMPORTANT INSTRUCTIONS:
     ];
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       messages: messages,
-      max_tokens: 500,
+      max_tokens: 300,
     });
 
     const response = completion.choices[0].message.content;
