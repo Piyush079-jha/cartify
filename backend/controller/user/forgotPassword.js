@@ -33,14 +33,7 @@ async function forgotPasswordController(req, res) {
         const resetLink = process.env.FRONTEND_URL + "/reset-password?token=" + resetToken + "&email=" + encodeURIComponent(email)
         const userName = user.name
 
-        // Using Gmail directly — no Brevo needed
-        // const transporter = nodemailer.createTransport({
-        //     service: "gmail",
-        //     auth: {
-        //         user: "piyushjha134@gmail.com",
-        //         pass: process.env.GMAIL_APP_PASSWORD
-        //     }
-        // })
+       
         const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -58,7 +51,7 @@ async function forgotPasswordController(req, res) {
             + '</div>'
 
         await transporter.sendMail({
-            from: '"Cartify Shop" <piyushjha134@gmail.com>',
+            from: '"Cartify Shop" <piyushjha1134@gmail.com>',
             to: email,
             subject: "Reset Your Password - Cartify",
             html: htmlContent
