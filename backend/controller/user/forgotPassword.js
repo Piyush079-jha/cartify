@@ -34,8 +34,10 @@ async function forgotPasswordController(req, res) {
         const userName = user.name
 
        
-        const transporter = nodemailer.createTransport({
-    service: "gmail",
+ const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
         user: "piyushjha1134@gmail.com",
         pass: process.env.GMAIL_APP_PASSWORD
