@@ -35,12 +35,12 @@ async function forgotPasswordController(req, res) {
 
        
  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
     auth: {
-        user: "piyushjha1134@gmail.com",
-        pass: process.env.GMAIL_APP_PASSWORD
+        user: "a2c224001@smtp-brevo.com",
+        pass: process.env.BREVO_SMTP_PASS
     }
 })
 
