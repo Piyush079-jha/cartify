@@ -1,6 +1,8 @@
 const userModel = require("../../models/userModel")
-const nodemailer = require("nodemailer")
 const crypto = require("crypto")
+const { Resend } = require("resend")
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 async function forgotPasswordController(req, res) {
     try {
@@ -33,17 +35,6 @@ async function forgotPasswordController(req, res) {
         const resetLink = process.env.FRONTEND_URL + "/reset-password?token=" + resetToken + "&email=" + encodeURIComponent(email)
         const userName = user.name
 
-       
- const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: "a2c224001@smtp-brevo.com",
-        pass: process.env.BREVO_SMTP_PASS
-    }
-})
-
         const htmlContent = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#f9f9f9;border-radius:16px;">'
             + '<h1 style="color:#667eea;text-align:center;">Cartify</h1>'
             + '<h2 style="color:#1a1a2e;">Reset Your Password</h2>'
@@ -52,8 +43,8 @@ async function forgotPasswordController(req, res) {
             + '<p style="color:#aaa;font-size:13px;margin-top:16px;">This link expires in 1 hour. If you did not request this, ignore this email.</p>'
             + '</div>'
 
-        await transporter.sendMail({
-            from: '"Cartify Shop" <piyushjha1134@gmail.com>',
+        await resend.emails.send({
+            from: 'Cartify Shop <onboarding@resend.dev>',
             to: email,
             subject: "Reset Your Password - Cartify",
             html: htmlContent
