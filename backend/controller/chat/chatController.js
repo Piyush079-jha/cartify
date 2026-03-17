@@ -1,7 +1,16 @@
 const Groq = require("groq-sdk");
 const productModel = require("../../models/productModel");
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Multi-key fallback setup
+const groqKeys = [
+  process.env.GROQ_API_KEY_1,
+  process.env.GROQ_API_KEY_2,
+  process.env.GROQ_API_KEY_3,
+].filter(Boolean);
+
+let currentKeyIndex = 0;
+
+const getGroqClient = () => new Groq({ apiKey: groqKeys[currentKeyIndex] });
 
 let cachedContext = null;
 let cacheTime = null;
@@ -22,6 +31,26 @@ const getProductContext = async () => {
     .join("\n");
   cacheTime = Date.now();
   return cachedContext;
+};
+
+const makeGroqRequest = async (messages, retryCount = 0) => {
+  try {
+    const groq = getGroqClient();
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      messages: messages,
+      max_tokens: 300,
+    });
+    return completion.choices[0].message.content;
+  } catch (error) {
+    // If invalid key and more keys available, rotate and retry
+    if (error.status === 401 && retryCount < groqKeys.length - 1) {
+      console.warn(`⚠️ Key ${currentKeyIndex + 1} failed, switching to next key...`);
+      currentKeyIndex = (currentKeyIndex + 1) % groqKeys.length;
+      return makeGroqRequest(messages, retryCount + 1);
+    }
+    throw error;
+  }
 };
 
 const chatController = async (req, res) => {
@@ -72,21 +101,13 @@ Also handle these naturally:
       { role: "user", content: message },
     ];
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: messages,
-      max_tokens: 300,
-    });
-
-    const response = completion.choices[0].message.content;
-
+    const response = await makeGroqRequest(messages);
     res.json({ success: true, message: response });
   } catch (error) {
-    console.error("Chat error:", error.message);
+    console.error("Chat error:", error);
     res.status(500).json({
       success: false,
-      message:
-        "Sorry, I'm having trouble responding right now. Please try again.",
+      message: "Sorry, I'm having trouble responding right now. Please try again.",
     });
   }
 };
