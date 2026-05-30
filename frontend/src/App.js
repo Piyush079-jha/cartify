@@ -1,7 +1,5 @@
-// Cartify — Root App Component
 // This is the heart of the frontend. Everything lives inside here:
 // routing, global state, dark mode, user session, and layout shell.
-
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
