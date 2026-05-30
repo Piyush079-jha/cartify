@@ -8,9 +8,7 @@ const SearchProduct = () => {
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
 
-    // gracefully handle missing outlet context (e.g. if rendered outside layout)
-    let isDark = false
-    try { ({ isDark } = useOutletContext()) } catch (_) {}
+    const { isDark = false } = useOutletContext() || {}
 
     const text   = isDark ? '#e8e4dc' : '#1a1814'
     const muted  = isDark ? '#555'    : '#aaa'
