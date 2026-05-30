@@ -15,16 +15,11 @@ const VerticalCard = ({ loading, data = [], isDark = false }) => {
     fetchUserAddToCart()
   }
 
-  const cardStyle = {
-    borderRadius: '18px',
-    overflow: 'hidden',
-    textDecoration: 'none',
-    display: 'block',
-    background: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff',
-    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #efefef',
-    transition: 'all 0.3s ease',
-    position: 'relative',
-  }
+  const surface = isDark ? '#161616' : '#ffffff'
+  const text    = isDark ? '#e8e4dc' : '#1a1814'
+  const muted   = isDark ? '#555'    : '#aaa'
+  const border  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,20,0.09)'
+  const gold    = '#c9a84c'
 
   return (
     <>
@@ -32,87 +27,80 @@ const VerticalCard = ({ loading, data = [], isDark = false }) => {
         .vc-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 16px;
+          gap: 1px;
+        }
+        .vc-card {
+          text-decoration: none;
+          display: block;
+          background: ${surface};
+          border: 0.5px solid ${border};
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .vc-card:hover {
+          border-color: ${gold};
+          box-shadow: 0 12px 40px rgba(0,0,0,0.09);
+          z-index: 1;
         }
         .vc-img-wrap {
-          height: 180px;
+          height: 200px;
           overflow: hidden;
-          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 24px;
+          background: ${isDark ? 'rgba(255,255,255,0.02)' : '#f7f6f4'};
+          border-bottom: 0.5px solid ${border};
         }
         .vc-img-wrap img {
           width: 100%;
           height: 100%;
           object-fit: contain;
+          mix-blend-mode: ${isDark ? 'lighten' : 'multiply'};
           transition: transform 0.4s ease;
-          position: relative;
-          z-index: 1;
         }
-        .vc-card:hover .vc-img-wrap img {
-          transform: scale(1.15);
-        }
+        .vc-card:hover .vc-img-wrap img { transform: scale(1.07); }
+
         @keyframes vcShimmer {
-          0% { opacity: 0.4; }
-          50% { opacity: 0.7; }
-          100% { opacity: 0.4; }
+          0%   { opacity: 0.3; }
+          50%  { opacity: 0.6; }
+          100% { opacity: 0.3; }
         }
-        .vc-skeleton {
-          animation: vcShimmer 1.5s infinite;
-          border-radius: 18px;
-        }
+        .vc-skeleton { animation: vcShimmer 1.6s infinite; }
+
         .vc-add-btn {
-          margin-top: 4px;
-          padding: 10px;
-          border-radius: 12px;
-          border: none;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: #fff;
-          font-size: 13px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          width: 100%;
-          box-shadow: 0 4px 14px rgba(102,126,234,0.28);
-          font-family: inherit;
+          width: 100%; padding: 9px 0;
+          border: 0.5px solid ${border};
+          background: transparent; color: ${muted};
+          font-size: 10px; font-weight: 400;
+          letter-spacing: 0.12em; text-transform: uppercase;
+          cursor: pointer; transition: all 0.2s ease;
+          font-family: 'DM Sans', -apple-system, sans-serif;
         }
         .vc-add-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+          border-color: ${gold};
+          color: ${gold};
+          background: rgba(201,168,76,0.04);
         }
 
         @media (max-width: 1024px) {
-          .vc-grid {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 14px;
-          }
+          .vc-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
         }
         @media (max-width: 768px) {
-          .vc-grid {
-            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-            gap: 12px;
-          }
-          .vc-img-wrap { height: 150px !important; }
-          .vc-name { font-size: 13px !important; }
-          .vc-price { font-size: 15px !important; }
-          .vc-add-btn { font-size: 12px !important; padding: 9px !important; }
+          .vc-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+          .vc-img-wrap { height: 160px !important; padding: 16px !important; }
+          .vc-name { font-size: 12px !important; }
+          .vc-price { font-size: 14px !important; }
         }
         @media (max-width: 480px) {
-          .vc-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-          }
-          .vc-img-wrap { height: 130px !important; }
-          .vc-name { font-size: 12px !important; min-height: 34px !important; }
-          .vc-price { font-size: 14px !important; }
-          .vc-add-btn { font-size: 11px !important; padding: 8px !important; border-radius: 10px !important; }
+          .vc-grid { grid-template-columns: repeat(2, 1fr); }
+          .vc-img-wrap { height: 135px !important; padding: 12px !important; }
           .vc-info { padding: 10px 12px !important; }
-          .vc-badge { font-size: 9px !important; padding: 3px 6px !important; }
-        }
-        @media (max-width: 360px) {
-          .vc-grid { gap: 8px; }
-          .vc-img-wrap { height: 110px !important; }
+          .vc-name { font-size: 11px !important; min-height: 32px !important; }
+          .vc-price { font-size: 13px !important; }
+          .vc-add-btn { font-size: 9px !important; padding: 8px 0 !important; }
+          .vc-badge { font-size: 8px !important; padding: 2px 5px !important; }
         }
       `}</style>
 
@@ -121,8 +109,8 @@ const VerticalCard = ({ loading, data = [], isDark = false }) => {
           loadingList.map((_, index) => (
             <div key={index} className="vc-skeleton" style={{
               height: '300px',
-              background: isDark ? 'rgba(255,255,255,0.06)' : '#f0f0f0',
-              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #efefef',
+              background: isDark ? 'rgba(255,255,255,0.04)' : '#f2f1ef',
+              border: `0.5px solid ${border}`,
             }} />
           ))
         ) : (
@@ -132,71 +120,47 @@ const VerticalCard = ({ loading, data = [], isDark = false }) => {
               key={index}
               onClick={scrollTop}
               className="vc-card"
-              style={cardStyle}
-              onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = '0 16px 36px rgba(102,126,234,0.22)'
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.borderColor = 'rgba(102,126,234,0.35)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = 'none'
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#efefef'
-              }}
             >
               {/* Discount Badge */}
               {product?.price > product?.sellingPrice && (
                 <div className="vc-badge" style={{
                   position: 'absolute', top: '10px', right: '10px',
-                  background: 'linear-gradient(135deg, #f093fb, #f5576c)',
-                  color: '#fff', fontSize: '10px', fontWeight: 700,
-                  padding: '4px 8px', borderRadius: '8px', zIndex: 2,
-                  boxShadow: '0 3px 10px rgba(245,87,108,0.35)'
+                  background: isDark ? 'rgba(201,168,76,0.15)' : 'rgba(201,168,76,0.12)',
+                  color: gold, fontSize: '9px', fontWeight: 500,
+                  padding: '2px 6px', letterSpacing: '0.06em', zIndex: 2
                 }}>
-                  {Math.round(((product.price - product.sellingPrice) / product.price) * 100)}% OFF
+                  −{Math.round(((product.price - product.sellingPrice) / product.price) * 100)}%
                 </div>
               )}
 
-              {/* Image - NO padding so zoom works properly */}
-              <div className="vc-img-wrap" style={{
-                background: isDark
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.05))'
-                  : 'linear-gradient(135deg, #fafafa, #f2f2f2)',
-              }}>
-                <div style={{
-                  position: 'absolute', width: '90px', height: '90px',
-                  background: 'rgba(102,126,234,0.08)', borderRadius: '50%',
-                  filter: 'blur(22px)', top: '50%', left: '50%',
-                  transform: 'translate(-50%,-50%)', pointerEvents: 'none', zIndex: 0
-                }} />
-                <img
-                  src={product?.productImage?.[0]}
-                  alt={product?.productName}
-                />
+              {/* Image */}
+              <div className="vc-img-wrap">
+                <img src={product?.productImage?.[0]} alt={product?.productName} />
               </div>
 
               {/* Info */}
-              <div className="vc-info" style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <div className="vc-info" style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <p style={{ fontSize: '9px', color: gold, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0, fontFamily: 'DM Sans, sans-serif' }}>
+                  {product?.category}
+                </p>
                 <h2 className="vc-name" style={{
-                  fontSize: '13px', fontWeight: 600,
-                  color: isDark ? '#ffffff' : '#111111',
-                  margin: 0, overflow: 'hidden', textOverflow: 'ellipsis',
+                  fontSize: '12px', fontWeight: 400,
+                  color: text, margin: 0,
+                  overflow: 'hidden', textOverflow: 'ellipsis',
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                  lineHeight: '1.45', minHeight: '38px'
+                  lineHeight: 1.55, minHeight: '37px',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  letterSpacing: '0.01em'
                 }}>
                   {product?.productName}
                 </h2>
 
-                <p style={{ fontSize: '11px', fontWeight: 600, color: '#667eea', textTransform: 'capitalize', margin: 0, letterSpacing: '0.03em' }}>
-                  {product?.category}
-                </p>
-
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px', flexWrap: 'wrap' }}>
-                  <span className="vc-price" style={{ fontSize: '16px', fontWeight: 700, background: 'linear-gradient(135deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '6px 0 8px', flexWrap: 'wrap' }}>
+                  <span className="vc-price" style={{ fontSize: '15px', fontWeight: 500, color: text, letterSpacing: '-0.01em', fontFamily: 'DM Sans, sans-serif' }}>
                     {displayINRCurrency(product?.sellingPrice)}
                   </span>
                   {product?.price !== product?.sellingPrice && (
-                    <span style={{ fontSize: '11px', color: isDark ? 'rgba(255,255,255,0.35)' : '#bbbbbb', textDecoration: 'line-through' }}>
+                    <span style={{ fontSize: '11px', color: muted, textDecoration: 'line-through', fontFamily: 'DM Sans, sans-serif' }}>
                       {displayINRCurrency(product?.price)}
                     </span>
                   )}
