@@ -17,14 +17,14 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
   const { fetchUserAddToCart } = useContext(Context)
 
   /* ── Tokens ── */
-  const surface = isDark ? '#161616'                 : '#ffffff'
-  const surfaceHover = isDark ? '#1c1c1c'            : '#fdfcfa'
-  const text    = isDark ? '#e8e4dc'                 : '#1a1814'
-  const muted   = isDark ? 'rgba(160,152,144,0.8)'   : 'rgba(130,125,118,0.9)'
-  const border  = isDark ? 'rgba(255,255,255,0.07)'  : 'rgba(26,24,20,0.08)'
-  const imgBg   = isDark ? 'rgba(255,255,255,0.02)'  : '#f7f6f4'
-  const gold    = '#c9a84c'
-  const imgBlend= isDark ? 'lighten'                 : 'multiply'
+  const surface      = isDark ? '#161616'                : '#ffffff'
+  const surfaceHover = isDark ? '#1c1c1c'                : '#fdfcfa'
+  const text         = isDark ? '#e8e4dc'                : '#1a1814'
+  const muted        = isDark ? 'rgba(160,152,144,0.8)'  : 'rgba(130,125,118,0.9)'
+  const border       = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,20,0.08)'
+  const imgBg        = isDark ? 'rgba(255,255,255,0.02)' : '#f7f6f4'
+  const gold         = '#c9a84c'
+  const imgBlend     = isDark ? 'lighten'                : 'multiply'
 
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id)
@@ -56,6 +56,11 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           padding: 44px 32px 0;
           position: relative;
         }
+
+        /* ── Responsive padding ── */
+        @media (max-width: 1024px) { .vcp-section { padding: 36px 24px 0; } }
+        @media (max-width: 768px)  { .vcp-section { padding: 32px 16px 0; } }
+        @media (max-width: 480px)  { .vcp-section { padding: 24px 12px 0; } }
 
         /* Header */
         .vcp-header {
@@ -89,7 +94,6 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           background: ${border};
           flex-shrink: 0;
         }
-
         .vcp-view-all {
           font-size: 10px;
           letter-spacing: 0.12em;
@@ -104,7 +108,6 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           color: ${gold};
           border-bottom-color: ${gold};
         }
-
         .vcp-rule {
           height: 0.5px;
           background: ${border};
@@ -173,9 +176,7 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
           z-index: 3;
         }
-        .vcp-card:hover::after {
-          transform: scaleX(1);
-        }
+        .vcp-card:hover::after { transform: scaleX(1); }
 
         /* Image zone */
         .vcp-img-zone {
@@ -190,7 +191,6 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           border-bottom: 0.5px solid ${border};
           position: relative;
         }
-
         .vcp-img-zone img {
           width: 100%;
           height: 100%;
@@ -198,9 +198,7 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           mix-blend-mode: ${imgBlend};
           transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .vcp-card:hover .vcp-img-zone img {
-          transform: scale(1.08);
-        }
+        .vcp-card:hover .vcp-img-zone img { transform: scale(1.08); }
 
         /* Wishlist position */
         .vcp-wishlist {
@@ -213,8 +211,7 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
         /* Discount badge */
         .vcp-badge {
           position: absolute;
-          top: 10px;
-          right: 10px;
+          top: 10px; right: 10px;
           background: ${isDark ? 'rgba(201,168,76,0.12)' : 'rgba(201,168,76,0.1)'};
           color: ${gold};
           font-size: 8.5px;
@@ -232,7 +229,6 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           flex-direction: column;
           flex: 1;
         }
-
         .vcp-category {
           font-size: 8.5px;
           color: ${gold};
@@ -241,7 +237,6 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           margin: 0 0 5px;
           font-weight: 400;
         }
-
         .vcp-name {
           font-size: 12px;
           font-weight: 400;
@@ -327,16 +322,15 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
         }
 
         @media (max-width: 768px) {
-          .vcp-section { padding: 32px 20px 0; }
-          .vcp-card     { min-width: 184px; max-width: 184px; }
-          .vcp-img-zone { height: 180px; padding: 18px; }
+          .vcp-card      { min-width: 184px; max-width: 184px; }
+          .vcp-img-zone  { height: 180px; padding: 18px; }
           .vcp-skel-card { min-width: 184px; max-width: 184px; }
           .vcp-skel-img  { height: 180px; }
         }
         @media (max-width: 480px) {
-          .vcp-card     { min-width: 158px; max-width: 158px; }
-          .vcp-img-zone { height: 158px; padding: 14px; }
-          .vcp-info     { padding: 12px 13px; }
+          .vcp-card      { min-width: 158px; max-width: 158px; }
+          .vcp-img-zone  { height: 158px; padding: 14px; }
+          .vcp-info      { padding: 12px 13px; }
           .vcp-skel-card { min-width: 158px; max-width: 158px; }
           .vcp-skel-img  { height: 158px; }
         }
@@ -387,7 +381,7 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
           ref={scrollElement}
           style={{
             display: 'flex',
-            gap: '1px',
+            gap: '12px',
             overflowX: 'auto',
             scrollbarWidth: 'none',
             scrollBehavior: 'smooth',
@@ -431,34 +425,23 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
                   </div>
 
                   {/* Discount badge */}
-                  {discount && (
-                    <div className="vcp-badge">−{discount}%</div>
-                  )}
+                  {discount && <div className="vcp-badge">−{discount}%</div>}
 
                   {/* Image */}
                   <div className="vcp-img-zone">
-                    <img
-                      src={product.productImage[0]}
-                      alt={product.productName}
-                    />
+                    <img src={product.productImage[0]} alt={product.productName} />
                   </div>
 
                   {/* Info */}
                   <div className="vcp-info">
                     <p className="vcp-category">{product?.category}</p>
                     <h3 className="vcp-name">{product?.productName}</h3>
-
                     <div className="vcp-price-row">
-                      <span className="vcp-price">
-                        {displayINRCurrency(product?.sellingPrice)}
-                      </span>
+                      <span className="vcp-price">{displayINRCurrency(product?.sellingPrice)}</span>
                       {product?.price !== product?.sellingPrice && (
-                        <span className="vcp-price-original">
-                          {displayINRCurrency(product?.price)}
-                        </span>
+                        <span className="vcp-price-original">{displayINRCurrency(product?.price)}</span>
                       )}
                     </div>
-
                     <button
                       className="vcp-cart-btn"
                       onClick={(e) => handleAddToCart(e, product?._id)}

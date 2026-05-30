@@ -29,13 +29,13 @@ const Header = ({ isDark, toggleDarkMode }) => {
   const [search, setSearch] = useState(searchQuery)
   const prevCart = useRef(context?.cartProductCount)
 
-  const bg     = isDark ? 'rgba(10,10,10,0.85)'  : 'rgba(250,249,247,0.85)'
-  const bgSolid= isDark ? '#0a0a0a' : '#faf9f7'
-  const text   = isDark ? '#e8e4dc' : '#1a1814'
-  const muted  = isDark ? '#888' : '#6b6660'
-  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.1)'
-  const surface= isDark ? '#141414' : '#ffffff'
-  const gold   = '#c9a84c'
+  const bg      = isDark ? 'rgba(10,10,10,0.85)'  : 'rgba(250,249,247,0.85)'
+  const bgSolid = isDark ? '#0a0a0a' : '#faf9f7'
+  const text    = isDark ? '#e8e4dc' : '#1a1814'
+  const muted   = isDark ? '#888' : '#6b6660'
+  const border  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.1)'
+  const surface = isDark ? '#141414' : '#ffffff'
+  const gold    = '#c9a84c'
   const goldGlow = isDark ? '0 0 20px rgba(201,168,76,0.25)' : '0 0 20px rgba(201,168,76,0.15)'
 
   useEffect(() => {
@@ -113,10 +113,6 @@ const Header = ({ isDark, toggleDarkMode }) => {
           70%  { transform: scale(1.2); }
           100% { transform: scale(1); }
         }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
         @keyframes mobileSlide {
           from { opacity:0; transform:translateY(-4px); }
           to   { opacity:1; transform:translateY(0); }
@@ -125,6 +121,21 @@ const Header = ({ isDark, toggleDarkMode }) => {
         .hdr-root {
           font-family: 'DM Sans', -apple-system, sans-serif;
         }
+
+        /* ── Full-width inner layout ── */
+        .hdr-inner {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          padding: 0 32px;
+          justify-content: space-between;
+          gap: 24px;
+        }
+        @media (max-width: 1024px) { .hdr-inner { padding: 0 24px; } }
+        @media (max-width: 768px)  { .hdr-inner { padding: 0 16px; } }
+        @media (max-width: 480px)  { .hdr-inner { padding: 0 12px; } }
+
         .hdr-nav-link {
           font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
           color: ${muted}; text-decoration: none; font-weight: 400;
@@ -158,9 +169,7 @@ const Header = ({ isDark, toggleDarkMode }) => {
           color: ${gold} !important;
           padding-left: 18px !important;
         }
-        .hdr-avatar-btn {
-          transition: all 0.2s ease;
-        }
+        .hdr-avatar-btn { transition: all 0.2s ease; }
         .hdr-avatar-btn:hover {
           border-color: ${gold} !important;
           box-shadow: ${goldGlow} !important;
@@ -181,16 +190,14 @@ const Header = ({ isDark, toggleDarkMode }) => {
         background: scrolled ? bg : bgSolid,
         backdropFilter: scrolled ? 'blur(20px) saturate(1.4)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(1.4)' : 'none',
-        borderBottom: `0.5px solid ${scrolled ? border : border}`,
+        borderBottom: `0.5px solid ${border}`,
         boxShadow: scrolled ? (isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.06)') : 'none',
         position: 'fixed', width: '100%', top: 0, zIndex: 50,
         transition: 'background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease'
       }}>
-        <div style={{
-          height: '100%', maxWidth: '1400px', margin: '0 auto',
-          display: 'flex', alignItems: 'center',
-          padding: '0 32px', justifyContent: 'space-between', gap: '24px'
-        }}>
+
+        {/* ── Full-width inner — no max-width cap ── */}
+        <div className="hdr-inner">
 
           {/* Logo */}
           <div style={{ flexShrink: 0, transition: 'transform 0.3s ease' }}
@@ -240,10 +247,10 @@ const Header = ({ isDark, toggleDarkMode }) => {
             </div>
           </div>
 
-          {/* Right */}
+          {/* Right icons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
 
-            {/* Mobile search */}
+            {/* Mobile search toggle */}
             <div className="hdr-mobile-btn" style={{ alignItems: 'center', cursor: 'pointer', color: muted, fontSize: '17px' }}
               onClick={() => setMobileSearchOpen(p => !p)}>
               <GrSearch />
@@ -251,7 +258,7 @@ const Header = ({ isDark, toggleDarkMode }) => {
 
             <DarkModeToggle isDark={isDark} toggleDarkMode={toggleDarkMode} />
 
-            {/* User avatar */}
+            {/* User avatar + dropdown */}
             {user?._id && (
               <div style={{ position: 'relative' }}>
                 <div className="hdr-avatar-btn"
@@ -348,7 +355,6 @@ const Header = ({ isDark, toggleDarkMode }) => {
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 textDecoration: 'none', transition: 'all 0.25s ease',
                 background: 'transparent', borderRadius: '2px',
-                position: 'relative', overflow: 'hidden'
               }}
                 onMouseEnter={e => {
                   e.currentTarget.style.background = gold

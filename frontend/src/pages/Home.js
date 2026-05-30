@@ -13,22 +13,41 @@ const Home = () => {
 
   const bg     = isDark ? '#0e0e0e' : '#faf9f7'
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.08)'
-  const muted  = isDark ? '#555' : '#ccc'
 
   return (
     <>
       <style>{`
+        /* ── Responsive container used for dividers and headings ── */
+        .home-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 32px;
+        }
+        @media (max-width: 1024px) { .home-container { padding: 0 24px; } }
+        @media (max-width: 768px)  { .home-container { padding: 0 16px; } }
+        @media (max-width: 480px)  { .home-container { padding: 0 12px; } }
+
         @media (max-width: 768px) { .home-wrapper { padding-top: 60px !important; } }
         @media (max-width: 480px) { .home-wrapper { padding-top: 60px !important; } }
 
         .home-section-label {
-          font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-          color: ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(26,24,20,0.45)'}; margin: 0 0 4px;
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(26,24,20,0.45)'};
+          margin: 0 0 4px;
         }
         .home-section-title {
-          font-size: 22px; font-weight: 300; letter-spacing: '-0.01em';
-          color: ${isDark ? '#e8e4dc' : '#1a1814'}; font-weight: 300;
-          font-family: Georgia, "Times New Roman", serif; margin: 0;
+          font-size: 22px;
+          font-weight: 300;
+          letter-spacing: -0.01em;
+          color: ${isDark ? '#e8e4dc' : '#1a1814'};
+          font-family: Georgia, "Times New Roman", serif;
+          margin: 0;
+        }
+        .home-divider {
+          height: 0.5px;
+          background: ${border};
         }
       `}</style>
 
@@ -38,7 +57,9 @@ const Home = () => {
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'opacity 0.5s ease, transform 0.5s ease',
-          paddingTop: '60px', minHeight: '100vh', background: bg
+          paddingTop: '0px',
+          minHeight: '100vh',
+          background: bg
         }}
       >
         {/* Category strip */}
@@ -48,38 +69,38 @@ const Home = () => {
         <BannerProduct isDark={isDark} />
 
         {/* Divider */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ height: '0.5px', background: border }} />
+        <div className="home-container">
+          <div className="home-divider" />
         </div>
 
-        {/* Horizontal featured sections */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 0' }}>
+        {/* Staff Picks heading */}
+        <div className="home-container" style={{ paddingTop: '48px' }}>
           <p className="home-section-label">Featured</p>
           <h2 className="home-section-title">Staff Picks</h2>
         </div>
 
         <HorizontalCardProduct isDark={isDark} category={"airpodes"} heading={"Airpods"} />
-        <HorizontalCardProduct isDark={isDark} category={"watches"} heading={"Watches"} />
+        <HorizontalCardProduct isDark={isDark} category={"watches"}  heading={"Watches"} />
 
         {/* Divider */}
-        <div style={{ maxWidth: '1400px', margin: '32px auto 0', padding: '0 32px' }}>
-          <div style={{ height: '0.5px', background: border }} />
+        <div className="home-container" style={{ marginTop: '32px' }}>
+          <div className="home-divider" />
         </div>
 
-        {/* Vertical product grid sections */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 0' }}>
+        {/* Our Collection heading */}
+        <div className="home-container" style={{ paddingTop: '48px' }}>
           <p className="home-section-label">Browse All</p>
           <h2 className="home-section-title">Our Collection</h2>
         </div>
 
-        <VerticalCardProduct isDark={isDark} category={"mobiles"}     heading={"Mobiles"} />
-        <VerticalCardProduct isDark={isDark} category={"mouse"}       heading={"Mouse"} />
-        <VerticalCardProduct isDark={isDark} category={"televisions"} heading={"Televisions"} />
-        <VerticalCardProduct isDark={isDark} category={"camera"}      heading={"Cameras"} />
-        <VerticalCardProduct isDark={isDark} category={"earphones"}   heading={"Earphones"} />
-        <VerticalCardProduct isDark={isDark} category={"speakers"}    heading={"Speakers"} />
+        <VerticalCardProduct isDark={isDark} category={"mobiles"}      heading={"Mobiles"} />
+        <VerticalCardProduct isDark={isDark} category={"mouse"}        heading={"Mouse"} />
+        <VerticalCardProduct isDark={isDark} category={"televisions"}  heading={"Televisions"} />
+        <VerticalCardProduct isDark={isDark} category={"camera"}       heading={"Cameras"} />
+        <VerticalCardProduct isDark={isDark} category={"earphones"}    heading={"Earphones"} />
+        <VerticalCardProduct isDark={isDark} category={"speakers"}     heading={"Speakers"} />
         <VerticalCardProduct isDark={isDark} category={"refrigerator"} heading={"Refrigerators"} />
-        <VerticalCardProduct isDark={isDark} category={"trimmers"}    heading={"Trimmers"} />
+        <VerticalCardProduct isDark={isDark} category={"trimmers"}     heading={"Trimmers"} />
 
         {/* Footer breathing room */}
         <div style={{ height: '64px' }} />

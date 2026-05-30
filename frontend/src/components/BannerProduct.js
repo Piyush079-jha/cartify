@@ -52,18 +52,37 @@ const BannerProduct = ({ isDark = false }) => {
           transition: all 0.2s ease; border-radius: 1px;
         }
         .bnr-btn:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.7); }
+
+        /* Responsive containers */
+        .bnr-heading {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 48px 32px 20px;
+        }
+        .bnr-outer {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 32px 40px;
+        }
+
+        @media (max-width: 1024px) {
+          .bnr-heading { padding: 40px 24px 16px; }
+          .bnr-outer   { padding: 0 24px 32px; }
+        }
         @media (max-width: 768px) {
-          .bnr-outer { padding: 0 20px !important; margin: 0 !important; }
-          .bnr-inner { height: 220px !important; }
+          .bnr-heading { padding: 28px 16px 12px; }
+          .bnr-outer   { padding: 0 16px 24px; }
+          .bnr-inner   { height: 220px !important; }
         }
         @media (max-width: 480px) {
-          .bnr-outer { padding: 0 !important; }
-          .bnr-inner { height: 180px !important; }
+          .bnr-heading { padding: 20px 12px 10px; }
+          .bnr-outer   { padding: 0 !important; }
+          .bnr-inner   { height: 180px !important; }
         }
       `}</style>
 
       {/* Editorial headline above banner */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 20px' }}>
+      <div className="bnr-heading">
         <p style={{
           fontSize: isMobile ? '28px' : '42px',
           fontWeight: 300, letterSpacing: '-0.02em',
@@ -76,7 +95,7 @@ const BannerProduct = ({ isDark = false }) => {
         </p>
       </div>
 
-      <div className="bnr-outer" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 40px' }}>
+      <div className="bnr-outer">
         <div
           className="bnr-wrap"
           style={{ position: 'relative' }}

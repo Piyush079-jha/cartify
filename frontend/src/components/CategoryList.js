@@ -9,7 +9,6 @@ const CategoryList = ({ isDark }) => {
   const categoryLoading = new Array(13).fill(null)
 
   const bg          = isDark ? '#0e0e0e'                 : '#f5f4f1'
-  const surface     = isDark ? '#161616'                 : '#eeecea'
   const text        = isDark ? 'rgba(160,152,144,0.9)'   : 'rgba(60,56,50,0.85)'
   const textHover   = isDark ? '#e8e4dc'                 : '#1a1814'
   const border      = isDark ? 'rgba(255,255,255,0.07)'  : 'rgba(26,24,20,0.13)'
@@ -35,6 +34,7 @@ const CategoryList = ({ isDark }) => {
           background: ${bg};
           border-bottom: 0.5px solid ${border};
           position: relative;
+          width: 100%;
         }
         .cl-wrap::before {
           content: '';
@@ -46,10 +46,12 @@ const CategoryList = ({ isDark }) => {
         }
 
         .cl-inner {
-          max-width: 1400px;
-          margin: 0 auto;
+          width: 100%;
           padding: 0 32px;
         }
+        @media (max-width: 1024px) { .cl-inner { padding: 0 24px; } }
+        @media (max-width: 768px)  { .cl-inner { padding: 0 16px; } }
+        @media (max-width: 480px)  { .cl-inner { padding: 0 12px; } }
 
         .cl-eyebrow {
           padding: 20px 0 0;
@@ -60,34 +62,36 @@ const CategoryList = ({ isDark }) => {
           font-weight: 500;
           font-family: 'DM Sans', sans-serif;
           margin: 0 0 2px;
+          text-align: center;
         }
 
+        /* ── Centered, evenly spaced, wraps on small screens ── */
         .cl-scroll {
           display: flex;
           align-items: stretch;
-          overflow-x: auto;
-          scrollbar-width: none;
+          justify-content: center;
+          flex-wrap: wrap;
           gap: 0;
+          overflow-x: visible;
         }
-        .cl-scroll::-webkit-scrollbar { display: none; }
 
         .cl-item {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 10px;
-          flex-shrink: 0;
-          padding: 18px 20px 20px;
+          flex: 1 1 0;
+          min-width: 80px;
+          max-width: 120px;
+          padding: 18px 12px 20px;
           text-decoration: none;
           cursor: pointer;
           border-right: 0.5px solid ${border};
           position: relative;
           transition: background 0.22s ease;
-          min-width: 92px;
         }
         .cl-item:first-child { border-left: 0.5px solid ${border}; }
 
-        /* Gold bottom bar reveal */
         .cl-item::after {
           content: '';
           position: absolute;
@@ -105,7 +109,6 @@ const CategoryList = ({ isDark }) => {
           background: ${isDark ? 'rgba(201,168,76,0.04)' : 'rgba(201,168,76,0.06)'};
         }
 
-        /* Image box */
         .cl-img-ring {
           width: 62px; height: 62px;
           border: 0.5px solid ${border};
@@ -130,7 +133,6 @@ const CategoryList = ({ isDark }) => {
         }
         .cl-item:hover .cl-img-ring img { transform: scale(1.1); }
 
-        /* Label */
         .cl-label {
           font-size: 10px;
           font-weight: 400;
@@ -151,10 +153,11 @@ const CategoryList = ({ isDark }) => {
         .cl-skeleton {
           display: flex; flex-direction: column;
           align-items: center; gap: 11px;
-          flex-shrink: 0;
-          padding: 18px 20px 20px;
+          flex: 1 1 0;
+          min-width: 80px;
+          max-width: 120px;
+          padding: 18px 12px 20px;
           border-right: 0.5px solid ${border};
-          min-width: 92px;
         }
         .cl-skel-img {
           width: 62px; height: 62px;
@@ -178,15 +181,17 @@ const CategoryList = ({ isDark }) => {
         }
 
         @media (max-width: 768px) {
-          .cl-inner   { padding: 0 20px; }
-          .cl-item    { padding: 14px 14px 16px; min-width: 78px; }
+          .cl-item     { padding: 14px 10px 16px; min-width: 68px; max-width: 100px; }
           .cl-img-ring { width: 52px; height: 52px; padding: 8px; }
-          .cl-label   { font-size: 9px; }
+          .cl-label    { font-size: 9px; }
+          .cl-skeleton { min-width: 68px; max-width: 100px; padding: 14px 10px 16px; }
+          .cl-skel-img { width: 52px; height: 52px; }
         }
         @media (max-width: 480px) {
-          .cl-inner   { padding: 0 12px; }
-          .cl-item    { padding: 12px 11px 14px; min-width: 68px; }
+          .cl-item     { padding: 12px 8px 14px; min-width: 58px; max-width: 80px; }
           .cl-img-ring { width: 44px; height: 44px; padding: 7px; }
+          .cl-skeleton { min-width: 58px; max-width: 80px; }
+          .cl-skel-img { width: 44px; height: 44px; }
         }
       `}</style>
 

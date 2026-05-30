@@ -62,7 +62,7 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-                gap: '16px'
+                gap: '24px'
             }}>
                 {loading ? (
                     loadingList.map((_, i) => (

@@ -7,8 +7,8 @@ import addToCart from '../helpers/addToCart'
 import Context from '../context'
 
 const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
-  const [data, setData]         = useState([])
-  const [loading, setLoading]   = useState(true)
+  const [data, setData]           = useState([])
+  const [loading, setLoading]     = useState(true)
   const [hoveredId, setHoveredId] = useState(null)
   const [btnHovered, setBtnHovered] = useState(null)
   const loadingList = new Array(6).fill(null)
@@ -16,15 +16,15 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
   const { fetchUserAddToCart } = useContext(Context)
 
   /* ── Tokens ── */
-  const bg      = isDark ? '#0e0e0e'                 : '#faf9f7'
-  const surface = isDark ? '#161616'                 : '#ffffff'
-  const surfaceHover = isDark ? '#1c1c1c'            : '#fdfcfa'
-  const text    = isDark ? '#e8e4dc'                 : '#1a1814'
-  const muted   = isDark ? 'rgba(160,152,144,0.8)'   : 'rgba(130,125,118,0.9)'
-  const border  = isDark ? 'rgba(255,255,255,0.07)'  : 'rgba(26,24,20,0.08)'
-  const imgBg   = isDark ? 'rgba(255,255,255,0.02)'  : '#f7f6f4'
-  const gold    = '#c9a84c'
-  const imgBlend= isDark ? 'lighten'                 : 'multiply'
+  const bg           = isDark ? '#0e0e0e'                : '#faf9f7'
+  const surface      = isDark ? '#161616'                : '#ffffff'
+  const surfaceHover = isDark ? '#1c1c1c'                : '#fdfcfa'
+  const text         = isDark ? '#e8e4dc'                : '#1a1814'
+  const muted        = isDark ? 'rgba(160,152,144,0.8)'  : 'rgba(130,125,118,0.9)'
+  const border       = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,20,0.08)'
+  const imgBg        = isDark ? 'rgba(255,255,255,0.02)' : '#f7f6f4'
+  const gold         = '#c9a84c'
+  const imgBlend     = isDark ? 'lighten'                : 'multiply'
 
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id)
@@ -40,12 +40,8 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const scrollRight = () => {
-    scrollElement.current.scrollLeft += 316
-  }
-  const scrollLeft = () => {
-    scrollElement.current.scrollLeft -= 316
-  }
+  const scrollRight = () => { scrollElement.current.scrollLeft += 316 }
+  const scrollLeft  = () => { scrollElement.current.scrollLeft -= 316 }
 
   return (
     <>
@@ -56,6 +52,11 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           padding: 40px 32px 0;
           position: relative;
         }
+
+        /* ── Responsive padding ── */
+        @media (max-width: 1024px) { .hcp-section { padding: 32px 24px 0; } }
+        @media (max-width: 768px)  { .hcp-section { padding: 28px 16px 0; } }
+        @media (max-width: 480px)  { .hcp-section { padding: 24px 12px 0; } }
 
         /* Section header */
         .hcp-header {
@@ -174,9 +175,7 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           transform-origin: bottom;
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .hcp-card:hover::before {
-          transform: scaleY(1);
-        }
+        .hcp-card:hover::before { transform: scaleY(1); }
 
         /* Image zone */
         .hcp-img-zone {
@@ -191,7 +190,6 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           position: relative;
           border-right: 0.5px solid ${border};
         }
-
         .hcp-img-zone img {
           width: 100%;
           height: 100%;
@@ -199,9 +197,7 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           mix-blend-mode: ${imgBlend};
           transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .hcp-card:hover .hcp-img-zone img {
-          transform: scale(1.08);
-        }
+        .hcp-card:hover .hcp-img-zone img { transform: scale(1.08); }
 
         /* Discount badge */
         .hcp-badge {
@@ -226,7 +222,6 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           justify-content: space-between;
           min-width: 0;
         }
-
         .hcp-category {
           font-size: 8.5px;
           color: ${gold};
@@ -235,7 +230,6 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           margin: 0 0 5px;
           font-weight: 400;
         }
-
         .hcp-name {
           font-size: 12px;
           font-weight: 400;
@@ -286,14 +280,6 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           position: relative;
           overflow: hidden;
         }
-        .hcp-cart-btn::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: ${gold};
-          opacity: 0;
-          transition: opacity 0.22s ease;
-        }
         .hcp-cart-btn:hover {
           border-color: ${gold};
           color: ${gold};
@@ -331,17 +317,16 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
         }
 
         @media (max-width: 768px) {
-          .hcp-section { padding: 28px 20px 0; }
-          .hcp-card { min-width: 268px; max-width: 268px; height: 148px; }
-          .hcp-img-zone { width: 112px; }
+          .hcp-card      { min-width: 268px; max-width: 268px; height: 148px; }
+          .hcp-img-zone  { width: 112px; }
           .hcp-skel-card { min-width: 268px; max-width: 268px; height: 148px; }
-          .hcp-skel-img { width: 112px; }
+          .hcp-skel-img  { width: 112px; }
         }
         @media (max-width: 480px) {
-          .hcp-card { min-width: 240px; max-width: 240px; height: 138px; }
-          .hcp-img-zone { width: 98px; padding: 12px; }
+          .hcp-card      { min-width: 240px; max-width: 240px; height: 138px; }
+          .hcp-img-zone  { width: 98px; padding: 12px; }
           .hcp-skel-card { min-width: 240px; max-width: 240px; height: 138px; }
-          .hcp-skel-img { width: 98px; }
+          .hcp-skel-img  { width: 98px; }
         }
       `}</style>
 
@@ -390,8 +375,7 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
           ref={scrollElement}
           style={{
             display: 'flex',
-            gap: '1px',
-            overflowX: 'auto',
+            gap: '12px',           overflowX: 'auto',
             scrollbarWidth: 'none',
             scrollBehavior: 'smooth'
           }}
@@ -424,13 +408,8 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
                 >
                   {/* Image */}
                   <div className="hcp-img-zone">
-                    {discount && (
-                      <div className="hcp-badge">−{discount}%</div>
-                    )}
-                    <img
-                      src={product.productImage[0]}
-                      alt={product.productName}
-                    />
+                    {discount && <div className="hcp-badge">−{discount}%</div>}
+                    <img src={product.productImage[0]} alt={product.productName} />
                   </div>
 
                   {/* Info */}
@@ -441,13 +420,9 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
                     </div>
                     <div>
                       <div className="hcp-price-row">
-                        <span className="hcp-price">
-                          {displayINRCurrency(product?.sellingPrice)}
-                        </span>
+                        <span className="hcp-price">{displayINRCurrency(product?.sellingPrice)}</span>
                         {product?.price !== product?.sellingPrice && (
-                          <span className="hcp-price-original">
-                            {displayINRCurrency(product?.price)}
-                          </span>
+                          <span className="hcp-price-original">{displayINRCurrency(product?.price)}</span>
                         )}
                       </div>
                       <button
