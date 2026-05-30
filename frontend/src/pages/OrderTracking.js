@@ -7,440 +7,992 @@ import Context from '../context'
 import { toast } from 'react-toastify'
 
 const statusSteps = [
-    { key: 'processing', label: 'Order Placed', icon: '📦', desc: 'Order received' },
-    { key: 'confirmed',  label: 'Confirmed',    icon: '✅', desc: 'Seller confirmed' },
-    { key: 'shipped',    label: 'Shipped',       icon: '🚚', desc: 'On the way' },
-    { key: 'delivered',  label: 'Delivered',     icon: '🏠', desc: 'Delivered!' },
+  { key: 'processing', label: 'Order Placed', icon: '◌', desc: 'Order received'    },
+  { key: 'confirmed',  label: 'Confirmed',    icon: '◎', desc: 'Seller confirmed'  },
+  { key: 'shipped',    label: 'Shipped',       icon: '◈', desc: 'On the way'        },
+  { key: 'delivered',  label: 'Delivered',     icon: '◉', desc: 'Delivered!'        },
 ]
 const statusIndex = { processing: 0, confirmed: 1, shipped: 2, delivered: 3 }
-const paymentLabel = { card: '💳 Card', upi: '📱 UPI', netbanking: '🏦 Net Banking', cod: '🚚 COD' }
 
-const statusStyle = {
-    processing: { bg: '#fff7ed', text: '#c2410c', dot: '#f97316', border: '#fed7aa', darkBg: '#431407', darkText: '#fb923c', darkBorder: '#7c2d12' },
-    confirmed:  { bg: '#eff6ff', text: '#1d4ed8', dot: '#3b82f6', border: '#bfdbfe', darkBg: '#1e3a5f', darkText: '#60a5fa', darkBorder: '#1e40af' },
-    shipped:    { bg: '#f0f9ff', text: '#0369a1', dot: '#0ea5e9', border: '#bae6fd', darkBg: '#0c2a3e', darkText: '#38bdf8', darkBorder: '#075985' },
-    delivered:  { bg: '#f0fdf4', text: '#15803d', dot: '#22c55e', border: '#bbf7d0', darkBg: '#052e16', darkText: '#4ade80', darkBorder: '#166534' },
-    cancelled:  { bg: '#fef2f2', text: '#b91c1c', dot: '#ef4444', border: '#fecaca', darkBg: '#450a0a', darkText: '#f87171', darkBorder: '#7f1d1d' },
+const paymentLabel = {
+  card:       'Card',
+  upi:        'UPI',
+  netbanking: 'Net Banking',
+  cod:        'Cash on Delivery'
 }
 
-const fmt = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+const statusMeta = {
+  processing: { color: '#c9a84c', bg: 'rgba(201,168,76,0.1)',  border: 'rgba(201,168,76,0.25)',  label: 'Processing' },
+  confirmed:  { color: '#7eb8a4', bg: 'rgba(126,184,164,0.1)', border: 'rgba(126,184,164,0.25)', label: 'Confirmed'  },
+  shipped:    { color: '#8ab4d4', bg: 'rgba(138,180,212,0.1)', border: 'rgba(138,180,212,0.25)', label: 'Shipped'    },
+  delivered:  { color: '#a8c080', bg: 'rgba(168,192,128,0.1)', border: 'rgba(168,192,128,0.25)', label: 'Delivered'  },
+  cancelled:  { color: '#c07878', bg: 'rgba(192,120,120,0.1)', border: 'rgba(192,120,120,0.25)', label: 'Cancelled'  },
+}
+
+const fmt = (d) => new Date(d).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'short', year: 'numeric',
+  hour: '2-digit', minute: '2-digit'
+})
 
 export default function OrderTracking() {
-    const navigate = useNavigate()
-    const context = useContext(Context)
-    const isDark = context?.isDark || false
+  const navigate = useNavigate()
+  const context  = useContext(Context)
+  const isDark   = context?.isDark || false
 
-    const [orders, setOrders] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [selected, setSelected] = useState(null)
+  const [orders, setOrders]                   = useState([])
+  const [loading, setLoading]                 = useState(true)
+  const [selected, setSelected]               = useState(null)
+  const [cancelling, setCancelling]           = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [mobileView, setMobileView]           = useState('list')
 
-    // ── NEW STATE (cancel + mobile)
-    const [cancelling, setCancelling] = useState(false)
-    const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-    const [mobileView, setMobileView] = useState('list') // 'list' | 'detail'
+  const bg      = isDark ? '#0e0e0e'                 : '#faf9f7'
+  const surface = isDark ? '#161616'                 : '#ffffff'
+  const surfaceAlt = isDark ? '#111110'              : '#f7f6f4'
+  const text    = isDark ? '#e8e4dc'                 : '#1a1814'
+  const muted   = isDark ? 'rgba(160,152,144,0.75)'  : 'rgba(130,125,118,0.85)'
+  const border  = isDark ? 'rgba(255,255,255,0.07)'  : 'rgba(26,24,20,0.09)'
+  const gold    = '#c9a84c'
+  const goldBg  = isDark ? 'rgba(201,168,76,0.07)'   : 'rgba(201,168,76,0.05)'
+  const goldBorder = 'rgba(201,168,76,0.22)'
 
-    // Theme tokens
-    const t = {
-        bg:         isDark ? '#0f172a' : '#f8fafc',
-        card:       isDark ? '#1e293b' : '#ffffff',
-        cardBorder: isDark ? '#334155' : '#e2e8f0',
-        text:       isDark ? '#f1f5f9' : '#0f172a',
-        textSub:    isDark ? '#94a3b8' : '#64748b',
-        textMuted:  isDark ? '#64748b' : '#94a3b8',
-        navBg:      isDark ? '#1e293b' : '#ffffff',
-        navBorder:  isDark ? '#334155' : '#e2e8f0',
-        rowBg:      isDark ? '#0f172a' : '#f8fafc',
-        rowBorder:  isDark ? '#1e293b' : '#f1f5f9',
-        chipBg:     isDark ? '#0f172a' : '#f1f5f9',
-        chipBorder: isDark ? '#334155' : '#e2e8f0',
-        trackBg:    isDark ? '#1e293b' : '#ffffff',
-        trackLine:  isDark ? '#334155' : '#e2e8f0',
-        itemBg:     isDark ? '#0f172a' : '#f8fafc',
-        itemBorder: isDark ? '#1e293b' : '#e2e8f0',
-    }
+  useEffect(() => { fetchOrders() }, [])
 
-    useEffect(() => { fetchOrders() }, [])
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch(SummaryApi.getOrders.url, {
+        method: SummaryApi.getOrders.method,
+        credentials: 'include'
+      })
+      if (res.status === 401) { navigate('/login'); return }
+      const data = await res.json()
+      if (data.success) {
+        setOrders(data.data)
+        if (data.data.length > 0) setSelected(data.data[0]._id)
+      }
+    } catch (e) { console.error(e) }
+    finally { setLoading(false) }
+  }
 
-    const fetchOrders = async () => {
-        try {
-            const res = await fetch(SummaryApi.getOrders.url, { method: SummaryApi.getOrders.method, credentials: 'include' })
-            if (res.status === 401) { navigate('/login'); return }
-            const data = await res.json()
-            if (data.success) { setOrders(data.data); if (data.data.length > 0) setSelected(data.data[0]._id) }
-        } catch (e) { console.error(e) }
-        finally { setLoading(false) }
-    }
+  const handleCancelOrder = async () => {
+    if (!order) return
+    setCancelling(true)
+    try {
+      const res = await fetch(SummaryApi.cancelOrder.url, {
+        method: SummaryApi.cancelOrder.method,
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ orderId: order._id })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Order cancelled')
+        setShowCancelConfirm(false)
+        setOrders(prev => prev.map(o =>
+          o._id === order._id ? { ...o, orderStatus: 'cancelled' } : o
+        ))
+      } else toast.error(data.message || 'Failed to cancel order')
+    } catch { toast.error('Something went wrong') }
+    finally { setCancelling(false) }
+  }
 
-    // ── NEW: Cancel Order handler
-    const handleCancelOrder = async () => {
-        if (!order) return
-        setCancelling(true)
-        try {
-            const res = await fetch(SummaryApi.cancelOrder.url, {
-                method: SummaryApi.cancelOrder.method,
-                credentials: 'include',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ orderId: order._id })
-            })
-            const data = await res.json()
-            if (data.success) {
-                toast.success('Order cancelled successfully')
-                setShowCancelConfirm(false)
-                // Update locally — no refetch needed, order stays in list as "cancelled"
-                setOrders(prev => prev.map(o => o._id === order._id ? { ...o, orderStatus: 'cancelled' } : o))
-            } else {
-                toast.error(data.message || 'Failed to cancel order')
-            }
-        } catch (e) {
-            toast.error('Something went wrong')
-        } finally {
-            setCancelling(false)
+  const order       = orders.find(o => o._id === selected)
+  const step        = order ? (statusIndex[order.orderStatus] ?? 0) : 0
+  const isCancelled = order?.orderStatus === 'cancelled'
+  const canCancel   = order && !isCancelled
+    && order.orderStatus !== 'delivered'
+    && order.orderStatus !== 'shipped'
+
+  const sm = order ? (statusMeta[order.orderStatus] || statusMeta.processing) : statusMeta.processing
+
+  if (loading) return (
+    <div style={{
+      minHeight: '100vh', display: 'flex',
+      alignItems: 'center', justifyContent: 'center',
+      background: bg
+    }}>
+      <style>{`@keyframes otSpin { to { transform: rotate(360deg) } }`}</style>
+      <div style={{
+        width: '28px', height: '28px',
+        border: `1.5px solid ${border}`,
+        borderTop: `1.5px solid ${gold}`,
+        borderRadius: '50%',
+        animation: 'otSpin 0.8s linear infinite'
+      }} />
+    </div>
+  )
+
+  return (
+    <>
+      <style>{`
+        @keyframes otFadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-    }
+        @keyframes otSlideUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes otSpin { to { transform: rotate(360deg) } }
 
-    const order = orders.find(o => o._id === selected)
-    const step  = order ? (statusIndex[order.orderStatus] ?? 0) : 0
-    const ss    = order ? (statusStyle[order.orderStatus] || statusStyle.processing) : statusStyle.processing
+        .ot-page {
+          min-height: 100vh;
+          background: ${bg};
+          font-family: 'DM Sans', -apple-system, sans-serif;
+          transition: background 0.3s ease;
+        }
 
-    // ── NEW: cancel/cancelled helpers
-    const isCancelled = order?.orderStatus === 'cancelled'
-    const canCancel   = order && !isCancelled && order.orderStatus !== 'delivered' && order.orderStatus !== 'shipped'
+        /* Topbar */
+        .ot-topbar {
+          background: ${isDark ? 'rgba(14,14,14,0.97)' : 'rgba(250,249,247,0.97)'};
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 0.5px solid ${border};
+          height: 57px;
+          display: flex;
+          align-items: center;
+          padding: 0 24px;
+          gap: 14px;
+          position: sticky;
+          top: 0;
+          z-index: 20;
+        }
+        .ot-back-btn {
+          width: 32px; height: 32px;
+          border: 0.5px solid ${border};
+          background: transparent;
+          color: ${muted};
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          border-radius: 1px;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        .ot-back-btn:hover { border-color: ${gold}; color: ${gold}; }
+        .ot-topbar-title {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 18px;
+          font-weight: 300;
+          color: ${text};
+          margin: 0;
+          letter-spacing: 0.01em;
+        }
+        .ot-topbar-count {
+          margin-left: auto;
+          font-size: 10px;
+          color: ${muted};
+          border: 0.5px solid ${border};
+          padding: 2px 8px;
+          letter-spacing: 0.08em;
+          font-family: 'DM Sans', sans-serif;
+          flex-shrink: 0;
+        }
 
-    const getBadgeStyle = (s) => isDark
-        ? { bg: s.darkBg, text: s.darkText, border: s.darkBorder, dot: s.dot }
-        : { bg: s.bg,     text: s.text,     border: s.border,     dot: s.dot }
+        /* Layout */
+        .ot-wrapper {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 28px 24px 64px;
+          display: grid;
+          grid-template-columns: 280px 1fr;
+          gap: 1px;
+          align-items: start;
+        }
 
-    if (loading) return (
-        <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background: t.bg }}>
-            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-            <div style={{ width:36, height:36, border:`3px solid ${t.cardBorder}`, borderTop:'3px solid #6366f1', borderRadius:'50%', animation:'spin 0.7s linear infinite' }} />
+        /* Order list */
+        .ot-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          position: sticky;
+          top: 72px;
+          max-height: calc(100vh - 90px);
+          overflow-y: auto;
+          scrollbar-width: none;
+          background: ${border};
+        }
+        .ot-list::-webkit-scrollbar { display: none; }
+
+        /* Order list item */
+        .ot-order-item {
+          background: ${surface};
+          padding: 16px;
+          cursor: pointer;
+          border-left: 1.5px solid transparent;
+          transition: border-color 0.2s ease, background 0.2s ease;
+          position: relative;
+        }
+        .ot-order-item:hover { background: ${surfaceAlt}; }
+        .ot-order-item.active {
+          border-left-color: ${gold};
+          background: ${goldBg};
+        }
+        .ot-order-id {
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: ${muted};
+          margin: 0 0 6px;
+          font-family: monospace;
+        }
+        .ot-order-amount {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 20px;
+          font-weight: 300;
+          color: ${text};
+          margin: 0 0 4px;
+          letter-spacing: -0.01em;
+          line-height: 1;
+        }
+        .ot-order-date {
+          font-size: 10px;
+          color: ${muted};
+          margin: 0 0 10px;
+          letter-spacing: 0.03em;
+        }
+
+        /* Status badge */
+        .ot-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 9px;
+          font-weight: 500;
+          padding: 3px 8px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          border: 0.5px solid;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .ot-badge-dot {
+          width: 4px; height: 4px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        /* Detail column */
+        .ot-detail {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          background: ${border};
+          animation: otFadeUp 0.3s ease;
+        }
+
+        /* Detail panels */
+        .ot-panel {
+          background: ${surface};
+          padding: 24px 28px;
+        }
+        .ot-panel-label {
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: ${muted};
+          margin: 0 0 16px;
+        }
+
+        /* Order summary header panel */
+        .ot-summary-panel {
+          background: ${isDark ? '#111110' : '#111110'};
+          padding: 24px 28px;
+          position: relative;
+          overflow: hidden;
+        }
+        .ot-summary-panel::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 2px;
+          background: ${gold};
+        }
+        .ot-summary-id {
+          font-size: 9px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+          margin: 0 0 4px;
+          font-family: monospace;
+        }
+        .ot-summary-amount {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 36px;
+          font-weight: 300;
+          color: ${gold};
+          margin: 0 0 16px;
+          letter-spacing: -0.02em;
+          line-height: 1;
+        }
+        .ot-summary-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1px;
+          background: rgba(255,255,255,0.06);
+          margin-top: 16px;
+        }
+        .ot-summary-cell {
+          background: rgba(255,255,255,0.03);
+          padding: 14px 16px;
+        }
+        .ot-summary-cell-label {
+          font-size: 8.5px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+          margin: 0 0 5px;
+        }
+        .ot-summary-cell-value {
+          font-size: 13px;
+          font-weight: 400;
+          color: rgba(255,255,255,0.85);
+          margin: 0;
+          letter-spacing: 0.01em;
+        }
+
+        /* Cancel button */
+        .ot-cancel-btn {
+          position: absolute;
+          top: 24px; right: 28px;
+          padding: 7px 14px;
+          background: transparent;
+          border: 0.5px solid rgba(192,120,120,0.35);
+          color: rgba(192,120,120,0.8);
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          transition: all 0.2s ease;
+          border-radius: 1px;
+        }
+        .ot-cancel-btn:hover {
+          border-color: #c07878;
+          color: #c07878;
+          background: rgba(192,120,120,0.08);
+        }
+
+        /* Tracking */
+        .ot-track-wrap {
+          display: flex;
+          align-items: flex-start;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .ot-track-wrap::-webkit-scrollbar { display: none; }
+        .ot-track-inner { display: flex; align-items: flex-start; min-width: 320px; width: 100%; }
+        .ot-step {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex: 1;
+        }
+        .ot-step-circle {
+          width: 40px; height: 40px;
+          border: 0.5px solid;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          position: relative;
+          flex-shrink: 0;
+          font-family: serif;
+        }
+        .ot-step-label {
+          font-size: 10px;
+          font-weight: 400;
+          text-align: center;
+          margin: 9px 0 3px;
+          letter-spacing: 0.04em;
+          font-family: 'DM Sans', sans-serif;
+          white-space: nowrap;
+        }
+        .ot-step-desc {
+          font-size: 9px;
+          text-align: center;
+          color: ${muted};
+          letter-spacing: 0.04em;
+          font-family: 'DM Sans', sans-serif;
+          max-width: 72px;
+          line-height: 1.5;
+        }
+        .ot-step-current {
+          font-size: 8px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: ${gold};
+          margin-top: 5px;
+          border: 0.5px solid ${goldBorder};
+          padding: 2px 8px;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .ot-track-line {
+          flex: 0.4;
+          height: 0.5px;
+          margin-top: 20px;
+          transition: background 0.4s ease;
+          flex-shrink: 0;
+        }
+
+        /* Item row */
+        .ot-item-row {
+          display: flex;
+          gap: 14px;
+          align-items: center;
+          padding: 14px 0;
+          border-bottom: 0.5px solid ${border};
+        }
+        .ot-item-row:last-child { border-bottom: none; }
+        .ot-item-img {
+          width: 52px; height: 52px;
+          border: 0.5px solid ${border};
+          background: ${surfaceAlt};
+          flex-shrink: 0;
+          overflow: hidden;
+          display: flex; align-items: center; justify-content: center;
+          padding: 6px;
+        }
+        .ot-item-img img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: ${isDark ? 'lighten' : 'multiply'}; }
+        .ot-item-name {
+          flex: 1;
+          font-size: 12px;
+          font-weight: 400;
+          color: ${text};
+          margin: 0 0 3px;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+          letter-spacing: 0.01em;
+        }
+        .ot-item-qty {
+          font-size: 10px;
+          color: ${muted};
+          margin: 0;
+          letter-spacing: 0.04em;
+        }
+        .ot-item-price {
+          font-size: 14px;
+          font-weight: 500;
+          color: ${text};
+          flex-shrink: 0;
+          letter-spacing: -0.01em;
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Address grid */
+        .ot-addr-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1px;
+          background: ${border};
+        }
+
+        /* Info rows */
+        .ot-info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 12px;
+          border-bottom: 0.5px solid ${border};
+        }
+        .ot-info-row:last-child { border-bottom: none; }
+        .ot-info-key {
+          font-size: 11px;
+          color: ${muted};
+          letter-spacing: 0.04em;
+        }
+        .ot-info-val {
+          font-size: 11px;
+          font-weight: 500;
+          color: ${text};
+          letter-spacing: 0.02em;
+        }
+
+        /* Empty state */
+        .ot-empty {
+          text-align: center;
+          padding: 100px 20px;
+          animation: otFadeUp 0.4s ease;
+        }
+
+        /* Mobile */
+        .ot-mobile-back { display: none; }
+
+        @media (max-width: 860px) {
+          .ot-wrapper {
+            grid-template-columns: 1fr;
+            padding: 0;
+            gap: 0;
+          }
+          .ot-list { position: static; max-height: none; }
+          .ot-mobile-back { display: flex; }
+          .ot-summary-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+          .ot-summary-grid { grid-template-columns: 1fr; }
+          .ot-addr-grid    { grid-template-columns: 1fr; }
+          .ot-panel        { padding: 18px 20px; }
+          .ot-summary-panel { padding: 20px; }
+          .ot-cancel-btn   { position: static; margin-top: 16px; width: 100%; }
+          .ot-summary-amount { font-size: 28px; }
+        }
+      `}</style>
+
+      <div className="ot-page">
+
+        {/* Topbar */}
+        <div className="ot-topbar">
+          <button
+            className="ot-back-btn"
+            onClick={() => mobileView === 'detail' ? setMobileView('list') : navigate('/')}
+            aria-label="Back"
+          >
+            <FaArrowLeft style={{ fontSize: '10px' }} />
+          </button>
+          <h1 className="ot-topbar-title">My Orders</h1>
+          {orders.length > 0 && (
+            <span className="ot-topbar-count">
+              {orders.length} order{orders.length !== 1 ? 's' : ''}
+            </span>
+          )}
         </div>
-    )
 
-    return (
-        <div style={{ minHeight:'100vh', background: t.bg, fontFamily:"'Inter',-apple-system,sans-serif", transition:'background 0.3s ease' }}>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-            <style>{`
-                @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-                @keyframes spin{to{transform:rotate(360deg)}}
-                @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-                .ocard{transition:all 0.18s ease;cursor:pointer;}
-                .ocard:hover{border-color:#6366f1!important;transform:translateY(-1px);box-shadow:0 6px 20px rgba(99,102,241,0.18)!important;}
+        {/* Empty state */}
+        {orders.length === 0 ? (
+          <div className="ot-empty">
+            <MdInventory style={{ fontSize: '40px', color: muted, marginBottom: '16px' }} />
+            <h3 style={{
+              fontFamily: 'Cormorant Garamond, Georgia, serif',
+              fontSize: '24px', fontWeight: 300, color: text,
+              margin: '0 0 8px'
+            }}>
+              No orders yet
+            </h3>
+            <p style={{ fontSize: '12px', color: muted, margin: '0 0 28px', letterSpacing: '0.04em' }}>
+              Start shopping to see your orders here
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              style={{
+                padding: '11px 28px',
+                background: 'transparent',
+                border: `0.5px solid ${gold}`,
+                color: gold,
+                fontSize: '10px', fontWeight: 500,
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                cursor: 'pointer', transition: 'all 0.25s ease',
+                fontFamily: 'DM Sans, sans-serif', borderRadius: '1px'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = gold; e.currentTarget.style.color = '#0a0a0a' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = gold }}
+            >
+              Browse Products
+            </button>
+          </div>
+        ) : (
+          <div className="ot-wrapper">
 
-                /* ── RESPONSIVE ── */
-                .ot-wrapper {
-                    max-width: 1100px;
-                    margin: 0 auto;
-                    padding: 28px 20px;
-                    display: grid;
-                    grid-template-columns: 290px 1fr;
-                    gap: 22px;
-                    align-items: start;
-                }
-                .ot-left  { display: flex; }
-                .ot-right { display: flex; }
-                .ot-mobile-back { display: none; }
+            {/* ── Order List */}
+            <div
+              className="ot-list"
+              style={{ display: mobileView === 'detail' ? 'none' : 'flex' }}
+            >
+              {orders.map(o => {
+                const isSel = selected === o._id
+                const isOCancelled = o.orderStatus === 'cancelled'
+                const meta = statusMeta[o.orderStatus] || statusMeta.processing
 
-                @media (max-width: 768px) {
-                    .ot-wrapper {
-                        grid-template-columns: 1fr !important;
-                        padding: 14px 12px !important;
-                        gap: 0 !important;
-                    }
-                    /* Mobile: show list OR detail based on mobileView state — handled via inline style below */
-                    .ot-mobile-back { display: flex !important; }
-                    .ot-nav-title { font-size: 0.88rem !important; }
-                    .ot-header-grid { grid-template-columns: 1fr 1fr !important; }
-                    .ot-addr-grid { grid-template-columns: 1fr !important; }
-                    .ot-track-scroll { overflow-x: auto; }
-                    .ot-track-inner { min-width: 320px; }
-                }
-
-                @media (max-width: 480px) {
-                    .ot-header-grid { grid-template-columns: 1fr !important; }
-                }
-            `}</style>
-
-            {/* ── NAVBAR */}
-            <div style={{ background: t.navBg, borderBottom:`1px solid ${t.navBorder}`, height:58, display:'flex', alignItems:'center', padding:'0 clamp(14px,4vw,28px)', gap:14, position:'sticky', top:0, zIndex:20, boxShadow:'0 1px 3px rgba(0,0,0,0.06)', transition:'all 0.3s ease' }}>
-                <button
-                    onClick={() => {
-                        // On mobile detail view → go back to list; otherwise go home
-                        if (mobileView === 'detail') { setMobileView('list') }
-                        else { navigate('/') }
-                    }}
-                    style={{ width:34, height:34, borderRadius:9, background: t.chipBg, border:`1px solid ${t.chipBorder}`, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color: t.textSub }}>
-                    <FaArrowLeft size={11}/>
-                </button>
-                <span className="ot-nav-title" style={{ fontWeight:700, fontSize:'1rem', color: t.text }}>My Orders</span>
-                {orders.length > 0 && (
-                    <span style={{ marginLeft:'auto', fontSize:'0.75rem', color: t.textSub, fontWeight:500, background: t.chipBg, padding:'3px 10px', borderRadius:20, border:`1px solid ${t.chipBorder}` }}>
-                        {orders.length} order{orders.length !== 1 ? 's' : ''}
-                    </span>
-                )}
+                return (
+                  <div
+                    key={o._id}
+                    className={`ot-order-item${isSel ? ' active' : ''}`}
+                    onClick={() => { setSelected(o._id); setMobileView('detail') }}
+                  >
+                    <p className="ot-order-id">#{o._id.slice(-10).toUpperCase()}</p>
+                    <p className="ot-order-amount">₹{o.totalAmount?.toLocaleString('en-IN')}</p>
+                    <p className="ot-order-date">{fmt(o.createdAt)}</p>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span
+                        className="ot-badge"
+                        style={{ color: meta.color, background: meta.bg, borderColor: meta.border }}
+                      >
+                        <span className="ot-badge-dot" style={{ background: meta.color }} />
+                        {meta.label}
+                      </span>
+                      <span style={{
+                        fontSize: '9px', color: muted,
+                        border: `0.5px solid ${border}`,
+                        padding: '2px 6px', letterSpacing: '0.06em',
+                        fontFamily: 'DM Sans, sans-serif'
+                      }}>
+                        {o.items?.length} item{o.items?.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
-            {orders.length === 0 ? (
-                <div style={{ textAlign:'center', padding:'clamp(60px,15vw,100px) 20px', animation:'fadeUp 0.4s ease' }}>
-                    <MdInventory size={56} color={t.textMuted}/>
-                    <h3 style={{ color: t.text, marginTop:16, fontWeight:700, fontSize:'1.1rem' }}>No orders yet</h3>
-                    <p style={{ color: t.textSub, fontSize:'0.85rem', marginBottom:24 }}>Start shopping to see your orders here.</p>
-                    <button onClick={() => navigate('/')} style={{ padding:'11px 28px', background:'#6366f1', border:'none', borderRadius:10, color:'#fff', fontWeight:600, cursor:'pointer', fontSize:'0.88rem', boxShadow:'0 4px 14px rgba(99,102,241,0.3)' }}>
-                        Start Shopping
-                    </button>
-                </div>
-            ) : (
-                <div className="ot-wrapper">
+            {/* ── Order Detail */}
+            {order && (
+              <div
+                className="ot-detail"
+                style={{ display: mobileView === 'list' ? 'none' : 'flex' }}
+              >
 
-                    {/* ── LEFT LIST ── hidden on mobile when viewing detail */}
-                    <div className="ot-left" style={{ flexDirection:'column', gap:10, position:'sticky', top:72, maxHeight:'calc(100vh - 90px)', overflowY:'auto', paddingRight:4,
-                        // Mobile: hide list when showing detail
-                        display: mobileView === 'detail' ? 'none' : 'flex'
-                    }}>
-                        <p style={{ margin:'0 0 6px', fontSize:'0.68rem', fontWeight:700, color: t.textMuted, textTransform:'uppercase', letterSpacing:'0.07em' }}>All Orders</p>
-                        {orders.map(o => {
-                            const isSel = selected === o._id
-                            const isOCancelled = o.orderStatus === 'cancelled'
-                            const s2 = statusStyle[o.orderStatus] || statusStyle.processing
-                            const b2 = getBadgeStyle(s2)
-                            return (
-                                <div key={o._id} className="ocard" onClick={() => { setSelected(o._id); setMobileView('detail') }}
-                                    style={{ background: t.card, borderRadius:14, padding:'14px 16px', border: isSel ? '2px solid #6366f1' : `1.5px solid ${t.cardBorder}`, boxShadow: isSel ? '0 6px 24px rgba(99,102,241,0.2)' : isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.05)', transition:'all 0.3s', opacity: isOCancelled ? 0.8 : 1 }}>
-                                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8, gap:6 }}>
-                                        <span style={{ fontSize:'0.68rem', color: t.textMuted, fontWeight:600, fontFamily:'monospace', background: t.chipBg, padding:'2px 6px', borderRadius:5, border:`1px solid ${t.chipBorder}` }}>
-                                            #{o._id.slice(-8).toUpperCase()}
-                                        </span>
-                                        <span style={{ fontSize:'0.65rem', padding:'3px 9px', borderRadius:20, background: b2.bg, color: b2.text, fontWeight:700, textTransform:'capitalize', border:`1px solid ${b2.border}`, display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
-                                            <span style={{ width:5, height:5, borderRadius:'50%', background: b2.dot, display:'inline-block' }}/>
-                                            {isOCancelled ? 'Cancelled' : o.orderStatus}
-                                        </span>
-                                    </div>
-                                    <p style={{ margin:'0 0 2px', fontWeight:800, fontSize:'clamp(0.9rem,3vw,1.05rem)', color: t.text }}>₹{o.totalAmount?.toLocaleString('en-IN')}</p>
-                                    <p style={{ margin:'0 0 10px', fontSize:'0.7rem', color: t.textMuted, fontWeight:500 }}>{fmt(o.createdAt)}</p>
-                                    <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                                        <span style={{ fontSize:'0.68rem', color: t.textSub, background: t.chipBg, border:`1px solid ${t.chipBorder}`, borderRadius:6, padding:'2px 8px', fontWeight:600 }}>
-                                            {paymentLabel[o.paymentMethod] || o.paymentMethod}
-                                        </span>
-                                        <span style={{ fontSize:'0.68rem', color: t.textMuted, background: t.rowBg, border:`1px solid ${t.rowBorder}`, borderRadius:6, padding:'2px 8px', fontWeight:500 }}>
-                                            {o.items?.length} item{o.items?.length !== 1 ? 's' : ''}
-                                        </span>
-                                        {/* ── NEW: cancelled tag on card */}
-                                        {isOCancelled && (
-                                            <span style={{ fontSize:'0.62rem', color: isDark ? '#f87171' : '#b91c1c', background: isDark ? '#450a0a' : '#fef2f2', border:`1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`, borderRadius:6, padding:'2px 7px', fontWeight:700 }}>
-                                                ❌ Cancelled
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
+                {/* Mobile back */}
+                <button
+                  className="ot-mobile-back"
+                  onClick={() => setMobileView('list')}
+                  style={{
+                    alignItems: 'center', gap: '8px',
+                    background: 'none',
+                    border: `0.5px solid ${border}`,
+                    color: muted,
+                    padding: '10px 16px',
+                    cursor: 'pointer',
+                    fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                    fontFamily: 'DM Sans, sans-serif', transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = gold; e.currentTarget.style.color = gold }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.color = muted }}
+                >
+                  <FaArrowLeft style={{ fontSize: '9px' }} /> Back to Orders
+                </button>
 
-                    {/* ── RIGHT DETAIL ── hidden on mobile when viewing list */}
-                    {order && (
-                        <div className="ot-right" style={{ flexDirection:'column', gap:16, animation:'fadeUp 0.3s ease',
-                            // Mobile: hide detail when showing list
-                            display: mobileView === 'list' ? 'none' : 'flex'
-                        }}>
+                {/* Summary panel */}
+                <div className="ot-summary-panel">
+                  <p className="ot-summary-id">#{order._id.slice(-14).toUpperCase()}</p>
+                  <p className="ot-summary-amount">
+                    ₹{order.totalAmount?.toLocaleString('en-IN')}
+                  </p>
 
-                            {/* Mobile back button */}
-                            <button className="ot-mobile-back"
-                                onClick={() => setMobileView('list')}
-                                style={{ display:'none', alignItems:'center', gap:8, background:'none', border:`1px solid ${t.cardBorder}`, borderRadius:10, padding:'8px 14px', color: t.textSub, cursor:'pointer', fontSize:'0.8rem', fontWeight:600, width:'fit-content', fontFamily:'inherit' }}>
-                                <FaArrowLeft size={10}/> Back to Orders
-                            </button>
-
-                            {/* ── Gradient Header */}
-                            <div style={{ background: isCancelled ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', borderRadius:18, padding:'clamp(16px,4vw,24px) clamp(16px,4vw,26px)', color:'#fff', boxShadow: isCancelled ? '0 8px 30px rgba(239,68,68,0.35)' : '0 8px 30px rgba(99,102,241,0.35)' }}>
-                                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20, flexWrap:'wrap', gap:'10px' }}>
-                                    <div>
-                                        <p style={{ margin:'0 0 4px', fontSize:'0.68rem', fontWeight:600, opacity:0.75, textTransform:'uppercase', letterSpacing:'0.07em' }}>Order ID</p>
-                                        <p style={{ margin:0, fontWeight:700, fontSize:'clamp(0.78rem,2.5vw,0.95rem)', fontFamily:'monospace', letterSpacing:'0.05em' }}>#{order._id.slice(-12).toUpperCase()}</p>
-                                    </div>
-                                    <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
-                                        <span style={{ fontSize:'0.72rem', padding:'5px 14px', borderRadius:20, background:'rgba(255,255,255,0.2)', color:'#fff', fontWeight:700, textTransform:'capitalize', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.3)' }}>
-                                            {isCancelled ? '❌ Cancelled' : order.orderStatus}
-                                        </span>
-                                        {/* ── NEW: Cancel Order button in header */}
-                                        {canCancel && (
-                                            <button onClick={() => setShowCancelConfirm(true)}
-                                                style={{ fontSize:'0.72rem', padding:'5px 14px', borderRadius:20, background:'rgba(255,255,255,0.15)', color:'#fff', fontWeight:700, border:'1.5px solid rgba(255,255,255,0.5)', cursor:'pointer', backdropFilter:'blur(8px)', transition:'all 0.2s', fontFamily:'inherit' }}
-                                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.45)'; e.currentTarget.style.borderColor = '#fff' }}
-                                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)' }}>
-                                                ✕ Cancel Order
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="ot-header-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
-                                    {[
-                                        { label:'Placed On', val: fmt(order.createdAt) },
-                                        { label:'Payment', val: paymentLabel[order.paymentMethod] || order.paymentMethod },
-                                        { label:'Total Amount', val: `₹${order.totalAmount?.toLocaleString('en-IN')}` },
-                                    ].map(r => (
-                                        <div key={r.label} style={{ background:'rgba(255,255,255,0.15)', borderRadius:12, padding:'12px 14px', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.2)' }}>
-                                            <p style={{ margin:'0 0 3px', fontSize:'0.62rem', opacity:0.75, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>{r.label}</p>
-                                            <p style={{ margin:0, fontWeight:700, fontSize:'clamp(0.72rem,2vw,0.85rem)' }}>{r.val}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* ── NEW: Cancelled info banner */}
-                            {isCancelled && (
-                                <div style={{ background: isDark ? '#450a0a' : '#fef2f2', border:`1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`, borderRadius:14, padding:'16px 20px', display:'flex', alignItems:'center', gap:12 }}>
-                                    <span style={{ fontSize:'1.4rem' }}>❌</span>
-                                    <div>
-                                        <p style={{ margin:'0 0 2px', fontWeight:700, fontSize:'0.88rem', color: isDark ? '#f87171' : '#b91c1c' }}>Order Cancelled</p>
-                                        <p style={{ margin:0, fontSize:'0.78rem', color: isDark ? '#fca5a5' : '#ef4444', lineHeight:1.5 }}>This order has been cancelled. Refund (if applicable) will be processed within 5–7 business days.</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* ── Tracking (hidden if cancelled) */}
-                            {!isCancelled && (
-                                <div style={{ background: t.card, borderRadius:16, padding:'24px 26px', border:`1px solid ${t.cardBorder}`, boxShadow: isDark ? 'none' : '0 1px 6px rgba(0,0,0,0.04)', transition:'all 0.3s' }}>
-                                    <p style={{ margin:'0 0 24px', fontWeight:700, fontSize:'0.9rem', color: t.text }}>Order Tracking</p>
-                                    <div className="ot-track-scroll">
-                                        <div className="ot-track-inner" style={{ display:'flex', alignItems:'flex-start' }}>
-                                            {statusSteps.map((s, i) => {
-                                                const done   = i <= step
-                                                const active = i === step
-                                                return (
-                                                    <React.Fragment key={s.key}>
-                                                        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', flex:1 }}>
-                                                            <div style={{ width:'clamp(36px,8vw,46px)', height:'clamp(36px,8vw,46px)', borderRadius:'50%', background: active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : done ? (isDark ? '#312e81' : '#ede9fe') : t.chipBg, border: active ? '2px solid #6366f1' : done ? `2px solid ${isDark ? '#4f46e5' : '#a5b4fc'}` : `2px solid ${t.cardBorder}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize: active ? 'clamp(0.9rem,3vw,1.2rem)' : 'clamp(0.8rem,2.5vw,1rem)', boxShadow: active ? '0 0 0 7px rgba(99,102,241,0.15)' : 'none', transition:'all 0.3s' }}>
-                                                                {s.icon}
-                                                            </div>
-                                                            <p style={{ margin:'9px 0 2px', fontSize:'clamp(0.6rem,1.8vw,0.73rem)', fontWeight: active ? 700 : done ? 600 : 500, color: active ? '#818cf8' : done ? t.text : t.textMuted, textAlign:'center', whiteSpace:'nowrap' }}>{s.label}</p>
-                                                            <p style={{ margin:0, fontSize:'clamp(0.55rem,1.5vw,0.63rem)', color: done ? t.textSub : t.textMuted, textAlign:'center', maxWidth:80, lineHeight:1.4 }}>{s.desc}</p>
-                                                            {active && <span style={{ marginTop:6, fontSize:'0.6rem', padding:'2px 9px', background: isDark ? '#312e81' : '#ede9fe', color: isDark ? '#a5b4fc' : '#6366f1', borderRadius:20, fontWeight:700, border:`1px solid ${isDark ? '#4338ca' : '#c4b5fd'}` }}>Current</span>}
-                                                        </div>
-                                                        {i < statusSteps.length - 1 && (
-                                                            <div style={{ flex:0.5, height:3, background: i < step ? 'linear-gradient(90deg,#6366f1,#8b5cf6)' : t.trackLine, marginTop:22, borderRadius:4, transition:'all 0.4s' }}/>
-                                                        )}
-                                                    </React.Fragment>
-                                                )
-                                            })}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* ── Items */}
-                            <div style={{ background: t.card, borderRadius:16, padding:'clamp(16px,4vw,22px) clamp(16px,4vw,26px)', border:`1px solid ${t.cardBorder}`, boxShadow: isDark ? 'none' : '0 1px 6px rgba(0,0,0,0.04)', transition:'all 0.3s' }}>
-                                <p style={{ margin:'0 0 16px', fontWeight:700, fontSize:'0.9rem', color: t.text }}>
-                                    Items Ordered <span style={{ fontWeight:500, color: t.textMuted, fontSize:'0.8rem' }}>({order.items?.length})</span>
-                                </p>
-                                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                                    {order.items?.map((item, i) => (
-                                        <div key={i} style={{ display:'flex', gap:'clamp(8px,3vw,14px)', alignItems:'center', padding:'clamp(10px,3vw,12px) clamp(10px,3vw,14px)', background: t.itemBg, borderRadius:12, border:`1px solid ${t.itemBorder}` }}>
-                                            <div style={{ width:'clamp(40px,10vw,52px)', height:'clamp(40px,10vw,52px)', borderRadius:10, background: t.card, border:`1px solid ${t.cardBorder}`, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                                                {item.productImage ? <img src={item.productImage} alt="" style={{ width:'100%', height:'100%', objectFit:'contain' }}/> : <FaBox color={t.textMuted} size={18}/>}
-                                            </div>
-                                            <div style={{ flex:1, minWidth:0 }}>
-                                                <p style={{ margin:0, fontWeight:600, fontSize:'clamp(0.78rem,2.5vw,0.86rem)', color: t.text, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.productName}</p>
-                                                <p style={{ margin:'3px 0 0', fontSize:'clamp(0.68rem,2vw,0.73rem)', color: t.textSub, fontWeight:500 }}>Qty: {item.quantity} &times; ₹{item.price?.toLocaleString('en-IN')}</p>
-                                            </div>
-                                            <p style={{ margin:0, fontWeight:700, fontSize:'clamp(0.8rem,2.5vw,0.9rem)', color: t.text, flexShrink:0 }}>₹{(item.price * item.quantity)?.toLocaleString('en-IN')}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div style={{ marginTop:14, paddingTop:14, borderTop:`1px solid ${t.rowBorder}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                                    <span style={{ fontWeight:600, fontSize:'0.9rem', color: t.textSub }}>Total Amount</span>
-                                    <span style={{ fontWeight:800, fontSize:'clamp(1rem,3vw,1.2rem)', color:'#818cf8' }}>₹{order.totalAmount?.toLocaleString('en-IN')}</span>
-                                </div>
-                            </div>
-
-                            {/* ── Address + Info */}
-                            <div className="ot-addr-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                                {/* Address */}
-                                <div style={{ background: t.card, borderRadius:16, padding:'clamp(14px,4vw,20px) clamp(14px,4vw,22px)', border:`1px solid ${t.cardBorder}`, boxShadow: isDark ? 'none' : '0 1px 6px rgba(0,0,0,0.04)', transition:'all 0.3s' }}>
-                                    <p style={{ margin:'0 0 14px', fontWeight:700, fontSize:'0.88rem', color: t.text, display:'flex', alignItems:'center', gap:7 }}>
-                                        <span style={{ width:28, height:28, borderRadius:8, background: isDark ? '#422006' : '#fef3c7', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'0.85rem' }}>📍</span>
-                                        Delivery Address
-                                    </p>
-                                    <p style={{ margin:'0 0 3px', fontWeight:700, fontSize:'0.85rem', color: t.text }}>{order.deliveryAddress?.name}</p>
-                                    <p style={{ margin:'0 0 2px', fontSize:'0.8rem', color: t.textSub, lineHeight:1.6 }}>{order.deliveryAddress?.address}</p>
-                                    <p style={{ margin:'0 0 2px', fontSize:'0.8rem', color: t.textSub }}>{order.deliveryAddress?.city}, {order.deliveryAddress?.state}</p>
-                                    <p style={{ margin:'0 0 6px', fontSize:'0.8rem', color: t.textSub }}>PIN: {order.deliveryAddress?.pincode}</p>
-                                    <p style={{ margin:0, fontSize:'0.8rem', color:'#818cf8', fontWeight:600 }}>📞 {order.deliveryAddress?.phone}</p>
-                                </div>
-
-                                {/* Order Info */}
-                                <div style={{ background: t.card, borderRadius:16, padding:'clamp(14px,4vw,20px) clamp(14px,4vw,22px)', border:`1px solid ${t.cardBorder}`, boxShadow: isDark ? 'none' : '0 1px 6px rgba(0,0,0,0.04)', transition:'all 0.3s' }}>
-                                    <p style={{ margin:'0 0 14px', fontWeight:700, fontSize:'0.88rem', color: t.text, display:'flex', alignItems:'center', gap:7 }}>
-                                        <span style={{ width:28, height:28, borderRadius:8, background: isDark ? '#1e3a5f' : '#dbeafe', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'0.85rem' }}>🧾</span>
-                                        Order Info
-                                    </p>
-                                    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                                        {[
-                                            { label:'Payment Method', val: paymentLabel[order.paymentMethod] || order.paymentMethod },
-                                            { label:'Payment Status', val: order.paymentStatus === 'paid' ? '✅ Paid' : '⏳ Pending', color: order.paymentStatus === 'paid' ? (isDark ? '#4ade80' : '#15803d') : (isDark ? '#fbbf24' : '#b45309'), bg: order.paymentStatus === 'paid' ? (isDark ? '#052e16' : '#f0fdf4') : (isDark ? '#431407' : '#fffbeb') },
-                                            { label:'Delivery Charge', val:'🚚 FREE', color: isDark ? '#4ade80' : '#15803d' },
-                                        ].map(r => (
-                                            <div key={r.label} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 10px', background: t.itemBg, borderRadius:8, border:`1px solid ${t.itemBorder}` }}>
-                                                <span style={{ fontSize:'0.78rem', color: t.textSub, fontWeight:500 }}>{r.label}</span>
-                                                <span style={{ fontSize:'0.78rem', fontWeight:700, color: r.color || t.text, background: r.bg, padding: r.bg ? '2px 8px' : 0, borderRadius: r.bg ? 6 : 0 }}>{r.val}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
+                  {/* Status badge + cancel */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <span
+                      className="ot-badge"
+                      style={{ color: sm.color, background: sm.bg, borderColor: sm.border }}
+                    >
+                      <span className="ot-badge-dot" style={{ background: sm.color }} />
+                      {sm.label}
+                    </span>
+                    {canCancel && (
+                      <button
+                        className="ot-cancel-btn"
+                        onClick={() => setShowCancelConfirm(true)}
+                      >
+                        Cancel Order
+                      </button>
                     )}
+                  </div>
+
+                  {/* Summary cells */}
+                  <div className="ot-summary-grid">
+                    {[
+                      { label: 'Placed On',  value: fmt(order.createdAt)                              },
+                      { label: 'Payment',    value: paymentLabel[order.paymentMethod] || order.paymentMethod },
+                      { label: 'Items',      value: `${order.items?.length} item${order.items?.length !== 1 ? 's' : ''}` },
+                    ].map((c, i) => (
+                      <div key={i} className="ot-summary-cell">
+                        <p className="ot-summary-cell-label">{c.label}</p>
+                        <p className="ot-summary-cell-value">{c.value}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-            )}
 
-            {/* ── NEW: Cancel Confirm Modal (Flipkart/Amazon style) ── */}
-            {showCancelConfirm && (
-                <div
-                    onClick={(e) => { if (e.target === e.currentTarget) setShowCancelConfirm(false) }}
-                    style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.6)', backdropFilter:'blur(6px)', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px' }}>
-                    <div style={{ background: t.card, borderRadius:20, padding:'clamp(20px,5vw,32px)', width:'100%', maxWidth:420, boxShadow:'0 24px 60px rgba(0,0,0,0.3)', border:`1px solid ${t.cardBorder}`, animation:'slideUp 0.25s ease' }}>
-                        <div style={{ textAlign:'center', marginBottom:20 }}>
-                            <div style={{ fontSize:'3rem', marginBottom:10 }}>🚫</div>
-                            <h2 style={{ margin:'0 0 8px', fontWeight:800, fontSize:'1.1rem', color: t.text }}>Cancel this order?</h2>
-                            <p style={{ margin:0, fontSize:'0.85rem', color: t.textSub, lineHeight:1.6 }}>
-                                Order <strong style={{ fontFamily:'monospace', color: t.text }}>#{order?._id.slice(-8).toUpperCase()}</strong> will be cancelled. This cannot be undone.
-                            </p>
-                        </div>
-
-                        {/* Order summary inside modal */}
-                        <div style={{ background: t.itemBg, borderRadius:12, padding:'12px 14px', marginBottom:16, border:`1px solid ${t.itemBorder}` }}>
-                            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
-                                <span style={{ fontSize:'0.78rem', color: t.textSub }}>Amount</span>
-                                <span style={{ fontWeight:700, color: t.text }}>₹{order?.totalAmount?.toLocaleString('en-IN')}</span>
-                            </div>
-                            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                                <span style={{ fontSize:'0.78rem', color: t.textSub }}>Items</span>
-                                <span style={{ fontWeight:600, color: t.text, fontSize:'0.78rem' }}>{order?.items?.length} item{order?.items?.length !== 1 ? 's' : ''}</span>
-                            </div>
-                        </div>
-
-                        <p style={{ margin:'0 0 20px', fontSize:'0.78rem', color: isDark ? '#fbbf24' : '#b45309', background: isDark ? '#431407' : '#fffbeb', padding:'10px 14px', borderRadius:10, border:`1px solid ${isDark ? '#78350f' : '#fde68a'}`, lineHeight:1.5 }}>
-                            💰 Refund (if applicable) will be processed within 5–7 business days to your original payment method.
+                {/* Cancelled banner */}
+                {isCancelled && (
+                  <div className="ot-panel" style={{ borderLeft: `1.5px solid rgba(192,120,120,0.5)` }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                      <span style={{
+                        width: '36px', height: '36px',
+                        border: '0.5px solid rgba(192,120,120,0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#c07878', fontSize: '14px', flexShrink: 0
+                      }}>✕</span>
+                      <div>
+                        <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 500, color: '#c07878', letterSpacing: '0.02em' }}>
+                          Order Cancelled
                         </p>
-
-                        <div style={{ display:'flex', gap:10 }}>
-                            <button
-                                onClick={() => setShowCancelConfirm(false)}
-                                style={{ flex:1, padding:'12px', background:'none', border:`1.5px solid ${t.cardBorder}`, borderRadius:12, color: t.textSub, fontWeight:600, fontSize:'0.88rem', cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s' }}
-                                onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f1'}
-                                onMouseLeave={e => e.currentTarget.style.borderColor = t.cardBorder}>
-                                Keep Order
-                            </button>
-                            <button
-                                onClick={handleCancelOrder}
-                                disabled={cancelling}
-                                style={{ flex:1, padding:'12px', background: cancelling ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#b91c1c)', border:'none', borderRadius:12, color:'#fff', fontWeight:700, fontSize:'0.88rem', cursor: cancelling ? 'not-allowed' : 'pointer', fontFamily:'inherit', transition:'all 0.2s', boxShadow: cancelling ? 'none' : '0 4px 14px rgba(239,68,68,0.35)' }}>
-                                {cancelling ? '⏳ Cancelling...' : 'Yes, Cancel'}
-                            </button>
-                        </div>
+                        <p style={{ margin: 0, fontSize: '12px', color: muted, lineHeight: 1.7, letterSpacing: '0.02em' }}>
+                          Refund (if applicable) will be processed within 5–7 business days.
+                        </p>
+                      </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Tracking */}
+                {!isCancelled && (
+                  <div className="ot-panel">
+                    <p className="ot-panel-label">Order Tracking</p>
+                    <div className="ot-track-wrap">
+                      <div className="ot-track-inner">
+                        {statusSteps.map((s, i) => {
+                          const done   = i <= step
+                          const active = i === step
+                          return (
+                            <React.Fragment key={s.key}>
+                              <div className="ot-step">
+                                <div
+                                  className="ot-step-circle"
+                                  style={{
+                                    borderColor: active ? gold : done ? 'rgba(201,168,76,0.4)' : border,
+                                    background: active
+                                      ? goldBg
+                                      : done
+                                        ? isDark ? 'rgba(201,168,76,0.04)' : 'rgba(201,168,76,0.04)'
+                                        : 'transparent',
+                                    color: active ? gold : done ? 'rgba(201,168,76,0.7)' : muted,
+                                    boxShadow: active ? `0 0 0 5px ${goldBg}` : 'none'
+                                  }}
+                                >
+                                  {s.icon}
+                                </div>
+                                <p
+                                  className="ot-step-label"
+                                  style={{ color: active ? gold : done ? text : muted }}
+                                >
+                                  {s.label}
+                                </p>
+                                <p className="ot-step-desc">{s.desc}</p>
+                                {active && <span className="ot-step-current">Current</span>}
+                              </div>
+                              {i < statusSteps.length - 1 && (
+                                <div
+                                  className="ot-track-line"
+                                  style={{
+                                    background: i < step
+                                      ? `linear-gradient(90deg, ${gold}, rgba(201,168,76,0.4))`
+                                      : border
+                                  }}
+                                />
+                              )}
+                            </React.Fragment>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Items */}
+                <div className="ot-panel">
+                  <p className="ot-panel-label">
+                    Items Ordered — {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
+                  </p>
+                  {order.items?.map((item, i) => (
+                    <div key={i} className="ot-item-row">
+                      <div className="ot-item-img">
+                        {item.productImage
+                          ? <img src={item.productImage} alt="" />
+                          : <FaBox style={{ color: muted, fontSize: '16px' }} />
+                        }
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p className="ot-item-name">{item.productName}</p>
+                        <p className="ot-item-qty">
+                          Qty: {item.quantity} × ₹{item.price?.toLocaleString('en-IN')}
+                        </p>
+                      </div>
+                      <p className="ot-item-price">
+                        ₹{(item.price * item.quantity)?.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                  ))}
+                  {/* Total row */}
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                    paddingTop: '16px', borderTop: `0.5px solid ${border}`, marginTop: '4px'
+                  }}>
+                    <span style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: muted }}>
+                      Total
+                    </span>
+                    <span style={{
+                      fontFamily: 'Cormorant Garamond, Georgia, serif',
+                      fontSize: '24px', fontWeight: 300, color: gold,
+                      letterSpacing: '-0.01em'
+                    }}>
+                      ₹{order.totalAmount?.toLocaleString('en-IN')}
+                    </span>
+                  </div>
                 </div>
+
+                {/* Address + Info */}
+                <div className="ot-addr-grid">
+                  {/* Delivery address */}
+                  <div className="ot-panel">
+                    <p className="ot-panel-label">Delivery Address</p>
+                    <p style={{ fontSize: '13px', fontWeight: 500, color: text, margin: '0 0 8px', letterSpacing: '0.01em' }}>
+                      {order.deliveryAddress?.name}
+                    </p>
+                    <p style={{ fontSize: '12px', color: muted, margin: '0 0 2px', lineHeight: 1.7, letterSpacing: '0.02em' }}>
+                      {order.deliveryAddress?.address}
+                    </p>
+                    <p style={{ fontSize: '12px', color: muted, margin: '0 0 2px', letterSpacing: '0.02em' }}>
+                      {order.deliveryAddress?.city}, {order.deliveryAddress?.state}
+                    </p>
+                    <p style={{ fontSize: '12px', color: muted, margin: '0 0 10px', letterSpacing: '0.02em' }}>
+                      PIN: {order.deliveryAddress?.pincode}
+                    </p>
+                    <p style={{ fontSize: '11px', color: gold, margin: 0, letterSpacing: '0.04em' }}>
+                      {order.deliveryAddress?.phone}
+                    </p>
+                  </div>
+
+                  {/* Order info */}
+                  <div className="ot-panel">
+                    <p className="ot-panel-label">Order Info</p>
+                    <div style={{ background: surfaceAlt, border: `0.5px solid ${border}` }}>
+                      {[
+                        { key: 'Payment Method', val: paymentLabel[order.paymentMethod] || order.paymentMethod },
+                        {
+                          key: 'Payment Status',
+                          val: order.paymentStatus === 'paid' ? 'Paid' : 'Pending',
+                          color: order.paymentStatus === 'paid' ? '#a8c080' : '#c9a84c'
+                        },
+                        { key: 'Delivery', val: 'Free', color: '#a8c080' },
+                      ].map((r, i) => (
+                        <div key={i} className="ot-info-row">
+                          <span className="ot-info-key">{r.key}</span>
+                          <span className="ot-info-val" style={{ color: r.color || text }}>
+                            {r.val}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             )}
-        </div>
-    )
+          </div>
+        )}
+
+        {/* Cancel confirmation modal */}
+        {showCancelConfirm && (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.78)',
+              backdropFilter: 'blur(10px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '20px'
+            }}
+            onClick={e => { if (e.target === e.currentTarget) setShowCancelConfirm(false) }}
+          >
+            <div style={{
+              background: '#111110',
+              border: '0.5px solid rgba(255,255,255,0.08)',
+              padding: '32px',
+              maxWidth: '380px', width: '100%',
+              boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
+              animation: 'otSlideUp 0.25s ease'
+            }}>
+              {/* Header */}
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div style={{
+                  width: '48px', height: '48px',
+                  border: '0.5px solid rgba(192,120,120,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 16px',
+                  color: '#c07878', fontSize: '18px'
+                }}>✕</div>
+                <h2 style={{
+                  fontFamily: 'Cormorant Garamond, Georgia, serif',
+                  fontSize: '24px', fontWeight: 300,
+                  color: '#e8e4dc', margin: '0 0 8px'
+                }}>
+                  Cancel Order?
+                </h2>
+                <p style={{
+                  fontSize: '12px', color: 'rgba(255,255,255,0.4)',
+                  margin: 0, lineHeight: 1.7, letterSpacing: '0.03em'
+                }}>
+                  Order <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em' }}>
+                    #{order?._id.slice(-10).toUpperCase()}
+                  </span> will be permanently cancelled.
+                </p>
+              </div>
+
+              {/* Order summary */}
+              <div style={{
+                border: `0.5px solid rgba(255,255,255,0.07)`,
+                background: 'rgba(255,255,255,0.02)',
+                padding: '16px',
+                marginBottom: '16px'
+              }}>
+                {[
+                  { label: 'Amount', value: `₹${order?.totalAmount?.toLocaleString('en-IN')}` },
+                  { label: 'Items',  value: `${order?.items?.length} item${order?.items?.length !== 1 ? 's' : ''}` },
+                ].map((r, i) => (
+                  <div key={i} style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    paddingBottom: i === 0 ? '10px' : 0,
+                    borderBottom: i === 0 ? '0.5px solid rgba(255,255,255,0.05)' : 'none',
+                    paddingTop: i === 1 ? '10px' : 0
+                  }}>
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}>{r.label}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}>{r.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Refund note */}
+              <p style={{
+                fontSize: '11px',
+                color: 'rgba(201,168,76,0.7)',
+                background: 'rgba(201,168,76,0.06)',
+                border: '0.5px solid rgba(201,168,76,0.15)',
+                padding: '10px 14px',
+                margin: '0 0 22px',
+                lineHeight: 1.7, letterSpacing: '0.03em'
+              }}>
+                Refund (if applicable) will be processed within 5–7 business days.
+              </p>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '1px' }}>
+                <button
+                  onClick={() => setShowCancelConfirm(false)}
+                  style={{
+                    flex: 1, padding: '13px',
+                    background: 'transparent',
+                    border: '0.5px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.45)',
+                    fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
+                    cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+                    transition: 'all 0.2s ease', borderRadius: '1px'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)' }}
+                >
+                  Keep Order
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  disabled={cancelling}
+                  style={{
+                    flex: 1, padding: '13px',
+                    background: 'transparent',
+                    border: `0.5px solid rgba(192,120,120,${cancelling ? '0.2' : '0.5'})`,
+                    color: cancelling ? 'rgba(192,120,120,0.3)' : '#c07878',
+                    fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
+                    cursor: cancelling ? 'not-allowed' : 'pointer',
+                    fontFamily: 'DM Sans, sans-serif',
+                    transition: 'all 0.2s ease', borderRadius: '1px'
+                  }}
+                  onMouseEnter={e => { if (!cancelling) { e.currentTarget.style.background = 'rgba(192,120,120,0.12)'; e.currentTarget.style.borderColor = '#c07878' }}}
+                  onMouseLeave={e => { if (!cancelling) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(192,120,120,0.5)' }}}
+                >
+                  {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  )
 }
