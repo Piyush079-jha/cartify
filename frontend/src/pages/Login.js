@@ -10,8 +10,14 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [data, setData] = useState({ email: "", password: "" })
   const [loading, setLoading] = useState(false)
+  const [focused, setFocused] = useState("")
   const navigate = useNavigate()
   const { fetchUserDetails, fetchUserAddToCart } = useContext(Context)
+
+  const gold        = '#c9a84c'
+  const goldGlow    = '0 0 0 2px rgba(201,168,76,0.18)'
+  const border      = 'rgba(255,255,255,0.09)'
+  const borderFocus = gold
 
   const handleOnChange = (e) => {
     const { name, value } = e.target
@@ -22,76 +28,303 @@ const Login = () => {
     e.preventDefault()
     setLoading(true)
     const dataResponse = await fetch(SummaryApi.signIn.url, {
-      method: SummaryApi.signIn.method, credentials: 'include',
-      headers: { "content-type": "application/json" }, body: JSON.stringify(data)
+      method: SummaryApi.signIn.method,
+      credentials: 'include',
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(data)
     })
     const dataApi = await dataResponse.json()
     setLoading(false)
-    if (dataApi.success) { toast.success(dataApi.message); navigate('/'); fetchUserDetails(); fetchUserAddToCart() }
+    if (dataApi.success) {
+      toast.success(dataApi.message)
+      navigate('/')
+      fetchUserDetails()
+      fetchUserAddToCart()
+    }
     if (dataApi.error) toast.error(dataApi.message)
-  }
-
-  const inputStyle = {
-    width: '100%', padding: '13px 16px',
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.13)',
-    borderRadius: '12px', color: '#fff', fontSize: '14px',
-    outline: 'none', boxSizing: 'border-box',
-    transition: 'border 0.2s', fontFamily: 'inherit'
   }
 
   return (
     <>
       <style>{`
-        .login-section { min-height: calc(100vh - 64px); background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
-        .login-card { background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); border-radius: 24px; padding: 40px 36px; width: 100%; max-width: 420px; box-shadow: 0 32px 80px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap');
+
+        .login-page {
+          min-height: calc(100vh - 60px);
+          background: #0a0a0a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 20px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* Ambient background glow */
+        .login-page::before {
+          content: '';
+          position: absolute;
+          top: -20%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .login-card {
+          width: 100%;
+          max-width: 400px;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Top brand mark */
+        .login-brand {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+        .login-brand-name {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 300;
+          letter-spacing: 0.4em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.25);
+          margin: 0 0 8px;
+        }
+        .login-brand-rule {
+          width: 32px;
+          height: 0.5px;
+          background: #c9a84c;
+          margin: 0 auto;
+          opacity: 0.5;
+        }
+
+        /* Avatar */
+        .login-avatar {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          border: 0.5px solid rgba(201,168,76,0.3);
+          overflow: hidden;
+          margin: 0 auto 28px;
+          background: rgba(255,255,255,0.03);
+          box-shadow: 0 0 32px rgba(201,168,76,0.1);
+        }
+
+        .login-heading {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 32px;
+          font-weight: 300;
+          color: #e8e4dc;
+          text-align: center;
+          margin: 0 0 6px;
+          letter-spacing: -0.01em;
+          line-height: 1.2;
+        }
+        .login-sub {
+          font-size: 12px;
+          color: rgba(255,255,255,0.25);
+          text-align: center;
+          margin: 0 0 36px;
+          letter-spacing: 0.06em;
+        }
+
+        /* Form */
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .login-label {
+          font-size: 9px;
+          font-weight: 500;
+          color: rgba(255,255,255,0.3);
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          display: block;
+          margin-bottom: 8px;
+        }
+        .login-input {
+          width: 100%;
+          padding: 12px 16px;
+          background: rgba(255,255,255,0.03);
+          border: 0.5px solid rgba(255,255,255,0.09);
+          color: #e8e4dc;
+          font-size: 13px;
+          outline: none;
+          box-sizing: border-box;
+          transition: border-color 0.22s ease, box-shadow 0.22s ease;
+          font-family: 'DM Sans', sans-serif;
+          letter-spacing: 0.02em;
+          border-radius: 1px;
+        }
+        .login-input::placeholder { color: rgba(255,255,255,0.18); }
+        .login-input:focus {
+          border-color: #c9a84c;
+          box-shadow: 0 0 0 2px rgba(201,168,76,0.1);
+          background: rgba(201,168,76,0.03);
+        }
+
+        .login-eye {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: rgba(255,255,255,0.25);
+          cursor: pointer;
+          font-size: 14px;
+          transition: color 0.2s ease;
+        }
+        .login-eye:hover { color: #c9a84c; }
+
+        .login-forgot {
+          text-align: right;
+          margin-top: 8px;
+        }
+        .login-forgot a {
+          font-size: 11px;
+          color: rgba(201,168,76,0.6);
+          text-decoration: none;
+          letter-spacing: 0.04em;
+          transition: color 0.2s ease;
+        }
+        .login-forgot a:hover { color: #c9a84c; }
+
+        .login-submit {
+          width: 100%;
+          padding: 13px;
+          background: transparent;
+          border: 0.5px solid #c9a84c;
+          color: #c9a84c;
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          font-family: 'DM Sans', sans-serif;
+          border-radius: 1px;
+          margin-top: 4px;
+        }
+        .login-submit:hover:not(:disabled) {
+          background: #c9a84c;
+          color: #0a0a0a;
+          box-shadow: 0 0 24px rgba(201,168,76,0.25);
+          letter-spacing: 0.22em;
+        }
+        .login-submit:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        /* Divider */
+        .login-divider {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin: 8px 0;
+        }
+        .login-divider-line {
+          flex: 1;
+          height: 0.5px;
+          background: rgba(255,255,255,0.07);
+        }
+        .login-divider-text {
+          font-size: 10px;
+          color: rgba(255,255,255,0.2);
+          letter-spacing: 0.1em;
+        }
+
+        .login-signup-row {
+          text-align: center;
+          font-size: 12px;
+          color: rgba(255,255,255,0.28);
+          margin-top: 24px;
+          letter-spacing: 0.03em;
+        }
+        .login-signup-row a {
+          color: #c9a84c;
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .login-signup-row a:hover { color: #e8d5a3; }
+
         @media (max-width: 480px) {
-          .login-card { padding: 28px 20px !important; border-radius: 20px !important; }
-          .login-section { padding: 16px 12px !important; align-items: flex-start !important; padding-top: 40px !important; }
+          .login-page { padding: 32px 20px; align-items: flex-start; padding-top: 60px; }
+          .login-heading { font-size: 26px; }
         }
       `}</style>
 
-      <section className="login-section">
+      <section className="login-page">
         <div className="login-card">
-          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(102,126,234,0.4)', border: '3px solid rgba(255,255,255,0.15)', overflow: 'hidden' }}>
-            <img src={loginIcons} alt='login' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-          <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '22px', textAlign: 'center', margin: '0 0 6px' }}>Welcome Back</h2>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', textAlign: 'center', margin: '0 0 28px' }}>Sign in to your account</p>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Brand */}
+          <div className="login-brand">
+            <p className="login-brand-name">Cartify</p>
+            <div className="login-brand-rule" />
+          </div>
+
+          {/* Avatar */}
+          <div className="login-avatar">
+            <img src={loginIcons} alt="login" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+
+          <h1 className="login-heading">Welcome back</h1>
+          <p className="login-sub">Sign in to continue</p>
+
+          <form onSubmit={handleSubmit} className="login-form">
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Email</label>
-              <input type='email' name='email' placeholder='enter your email' value={data.email} onChange={handleOnChange} required style={inputStyle}
-                onFocus={e => e.target.style.border = '1px solid #667eea'}
-                onBlur={e => e.target.style.border = '1px solid rgba(255,255,255,0.13)'}
+              <label className="login-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="your@email.com"
+                value={data.email}
+                onChange={handleOnChange}
+                className="login-input"
+                required
               />
             </div>
+
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Password</label>
+              <label className="login-label">Password</label>
               <div style={{ position: 'relative' }}>
-                <input type={showPassword ? "text" : "password"} name='password' placeholder='enter your password' value={data.password} onChange={handleOnChange} required style={{ ...inputStyle, paddingRight: '44px' }}
-                  onFocus={e => e.target.style.border = '1px solid #667eea'}
-                  onBlur={e => e.target.style.border = '1px solid rgba(255,255,255,0.13)'}
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  value={data.password}
+                  onChange={handleOnChange}
+                  className="login-input"
+                  style={{ paddingRight: '44px' }}
+                  required
                 />
-                <span onClick={() => setShowPassword(p => !p)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '16px' }}>
+                <span className="login-eye" onClick={() => setShowPassword(p => !p)}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-              <div style={{ textAlign: 'right', marginTop: '8px' }}>
-                <Link to='/forgot-password' style={{ color: '#a78bfa', fontSize: '13px', textDecoration: 'none', fontWeight: 500 }}>Forgot password?</Link>
+              <div className="login-forgot">
+                <Link to="/forgot-password">Forgot password?</Link>
               </div>
             </div>
-            <button type='submit' disabled={loading}
-              style={{ marginTop: '8px', padding: '14px', background: loading ? 'rgba(102,126,234,0.5)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 4px 16px rgba(102,126,234,0.35)', transition: 'all 0.3s', letterSpacing: '0.5px' }}
-              onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(102,126,234,0.5)' } }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(102,126,234,0.35)' }}
-            >{loading ? 'Signing in...' : 'Login'}</button>
+
+            <button type="submit" className="login-submit" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
           </form>
 
-          <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: '14px', marginTop: '24px' }}>
+          <div className="login-divider">
+            <div className="login-divider-line" />
+            <span className="login-divider-text">or</span>
+            <div className="login-divider-line" />
+          </div>
+
+          <p className="login-signup-row">
             Don't have an account?{' '}
-            <Link to="/sign-up" style={{ color: '#a78bfa', fontWeight: 700, textDecoration: 'none' }}>Sign up</Link>
+            <Link to="/sign-up">Create one</Link>
           </p>
         </div>
       </section>
