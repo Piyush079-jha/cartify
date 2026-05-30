@@ -32,7 +32,7 @@ const Header = ({ isDark, toggleDarkMode }) => {
   const bg     = isDark ? 'rgba(10,10,10,0.85)'  : 'rgba(250,249,247,0.85)'
   const bgSolid= isDark ? '#0a0a0a' : '#faf9f7'
   const text   = isDark ? '#e8e4dc' : '#1a1814'
-  const muted  = isDark ? '#666' : '#aaa'
+  const muted  = isDark ? '#888' : '#6b6660'
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.1)'
   const surface= isDark ? '#141414' : '#ffffff'
   const gold   = '#c9a84c'

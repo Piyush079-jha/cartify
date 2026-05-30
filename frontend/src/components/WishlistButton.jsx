@@ -5,124 +5,76 @@ import { toast } from 'react-toastify'
 
 const WishlistButton = ({ productId, isInWishlist, onToggle, isDark = false }) => {
   const [isAnimating, setIsAnimating] = useState(false)
-  const [hearts, setHearts] = useState([])
+
+  const gold        = '#c9a84c'
+  const border      = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(26,24,20,0.1)'
+  const heartActive = 'rgba(201,168,76,0.15)'
 
   const handleClick = async (e) => {
     e.preventDefault()
     e.stopPropagation()
-
     setIsAnimating(true)
-
-    // Floating hearts animation when adding
-    if (!isInWishlist) {
-      const newHearts = Array.from({ length: 5 }, (_, i) => ({
-        id: Date.now() + i,
-        x: (Math.random() - 0.5) * 60,
-        y: -30 - Math.random() * 20,
-        delay: i * 0.1
-      }))
-      setHearts(newHearts)
-      setTimeout(() => setHearts([]), 1000)
-    }
-
-    setTimeout(() => setIsAnimating(false), 300)
+    setTimeout(() => setIsAnimating(false), 320)
 
     try {
-      // Call backend API to toggle wishlist
       const response = await fetch(SummaryApi.addToWishlist.url, {
         method: SummaryApi.addToWishlist.method,
         credentials: 'include',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ productId })
       })
-
       const result = await response.json()
-
       if (result.success) {
         toast.success(result.message)
-        // Update local state in parent
         if (onToggle) onToggle(productId)
       } else {
         toast.error(result.message || 'Something went wrong')
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to update wishlist')
     }
   }
 
   return (
-    <button
-      onClick={handleClick}
-      style={{
-        position: 'relative',
-        width: '36px',
-        height: '36px',
-        borderRadius: '50%',
-        border: 'none',
-        background: isInWishlist
-          ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-          : isDark
-            ? 'rgba(255,255,255,0.1)'
-            : 'rgba(0,0,0,0.05)',
-        backdropFilter: 'blur(10px)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '16px',
-        color: isInWishlist ? '#fff' : isDark ? '#fff' : '#333',
-        transition: 'all 0.3s ease',
-        transform: isAnimating ? 'scale(1.2)' : 'scale(1)',
-        boxShadow: isInWishlist
-          ? '0 4px 12px rgba(245, 87, 108, 0.4)'
-          : 'none',
-        zIndex: 2
-      }}
-      onMouseEnter={e => {
-        if (!isAnimating) {
-          e.currentTarget.style.transform = 'scale(1.15)'
-          if (isInWishlist) e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 87, 108, 0.5)'
-        }
-      }}
-      onMouseLeave={e => {
-        if (!isAnimating) {
-          e.currentTarget.style.transform = 'scale(1)'
-          if (isInWishlist) e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 87, 108, 0.4)'
-        }
-      }}
-    >
-      {isInWishlist ? <FaHeart /> : <FaRegHeart />}
-
-      {/* Floating Hearts */}
-      {hearts.map((heart) => (
-        <div
-          key={heart.id}
-          style={{
-            position: 'absolute',
-            fontSize: '12px',
-            color: '#f5576c',
-            pointerEvents: 'none',
-            animation: `floatHeart 1s ease-out forwards`,
-            animationDelay: `${heart.delay}s`,
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            '--heart-x': `${heart.x}px`,
-            '--heart-y': `${heart.y}px`
-          }}
-        >
-          ❤️
-        </div>
-      ))}
-
+    <>
       <style>{`
-        @keyframes floatHeart {
-          0% { opacity: 1; transform: translate(-50%, -50%) scale(0); }
-          50% { opacity: 1; transform: translate(calc(-50% + var(--heart-x)), calc(-50% + var(--heart-y))) scale(1.2); }
-          100% { opacity: 0; transform: translate(calc(-50% + var(--heart-x)), calc(-50% + var(--heart-y) - 20px)) scale(0.8); }
+        @keyframes wbPulse {
+          0%   { transform: scale(1);    }
+          40%  { transform: scale(1.35); }
+          70%  { transform: scale(0.9);  }
+          100% { transform: scale(1);    }
         }
+        .wb-btn {
+          width: 32px; height: 32px;
+          border: 0.5px solid;
+          background: transparent;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          transition: border-color 0.22s ease, background 0.22s ease;
+          border-radius: 1px;
+          flex-shrink: 0;
+          z-index: 2;
+          position: relative;
+        }
+        .wb-btn:hover { border-color: ${gold} !important; }
       `}</style>
-    </button>
+
+      <button
+        className="wb-btn"
+        onClick={handleClick}
+        aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        style={{
+          borderColor: isInWishlist ? gold : border,
+          background:  isInWishlist ? heartActive : 'transparent',
+          animation:   isAnimating ? 'wbPulse 0.32s ease' : 'none',
+        }}
+      >
+        {isInWishlist
+          ? <FaHeart    style={{ fontSize: '13px', color: gold }} />
+          : <FaRegHeart style={{ fontSize: '13px', color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(26,24,20,0.35)' }} />
+        }
+      </button>
+    </>
   )
 }
 

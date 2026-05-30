@@ -23,11 +23,11 @@ const Home = () => {
 
         .home-section-label {
           font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-          color: ${isDark ? '#666' : '#aaa'}; margin: 0 0 4px;
+          color: ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(26,24,20,0.45)'}; margin: 0 0 4px;
         }
         .home-section-title {
           font-size: 22px; font-weight: 300; letter-spacing: '-0.01em';
-          color: ${isDark ? '#e8e4dc' : '#1a1814'};
+          color: ${isDark ? '#e8e4dc' : '#1a1814'}; font-weight: 300;
           font-family: Georgia, "Times New Roman", serif; margin: 0;
         }
       `}</style>

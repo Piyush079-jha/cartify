@@ -72,7 +72,7 @@ const BannerProduct = ({ isDark = false }) => {
           lineHeight: 1.2, margin: 0, maxWidth: '480px'
         }}>
           Discover what's<br />
-          <em style={{ fontStyle: 'italic', color: '#c9a84c' }}>new this season</em>
+          <em style={{ fontStyle: 'italic', color: '#c9a84c', fontWeight: 300 }}>new this season</em>
         </p>
       </div>
 

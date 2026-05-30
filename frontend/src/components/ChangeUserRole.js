@@ -5,164 +5,225 @@ import SummaryApi from '../common'
 import { toast } from 'react-toastify'
 
 const ChangeUserRole = ({ name, email, role, userId, onClose, callFunc }) => {
-    const [userRole, setUserRole] = useState(role)
+  const [userRole, setUserRole] = useState(role)
 
-    const updateUserRole = async () => {
-        const fetchResponse = await fetch(SummaryApi.updateUser.url, {
-            method: SummaryApi.updateUser.method,
-            credentials: 'include',
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ userId, role: userRole })
-        })
-        const responseData = await fetchResponse.json()
-        if (responseData.success) {
-            toast.success(responseData.message)
-            onClose()
-            callFunc()
-        } else {
-            toast.error(responseData.message)
-        }
+  const gold       = '#c9a84c'
+  const border     = 'rgba(255,255,255,0.08)'
+  const muted      = 'rgba(160,152,144,0.7)'
+  const text       = '#e8e4dc'
+  const goldBg     = 'rgba(201,168,76,0.07)'
+  const goldBorder = 'rgba(201,168,76,0.22)'
+
+  const updateUserRole = async () => {
+    const fetchResponse = await fetch(SummaryApi.updateUser.url, {
+      method: SummaryApi.updateUser.method,
+      credentials: 'include',
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId, role: userRole })
+    })
+    const responseData = await fetchResponse.json()
+    if (responseData.success) {
+      toast.success(responseData.message)
+      onClose()
+      callFunc()
+    } else {
+      toast.error(responseData.message)
     }
+  }
 
-    return (
+  return (
+    <>
+      <style>{`
+        @keyframes curSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .cur-select {
+          width: 100%; padding: 11px 14px;
+          background: rgba(255,255,255,0.03);
+          border: 0.5px solid ${border};
+          color: ${text}; font-size: 13px;
+          outline: none; cursor: pointer;
+          transition: border-color 0.2s ease, background 0.2s ease;
+          font-family: 'DM Sans', sans-serif;
+          letter-spacing: 0.02em; border-radius: 1px;
+          box-sizing: border-box;
+        }
+        .cur-select option { background: #111110; color: ${text}; }
+        .cur-select:focus {
+          border-color: ${gold};
+          background: ${goldBg};
+        }
+        .cur-btn {
+          flex: 1; padding: 12px;
+          font-size: 10px; font-weight: 500;
+          letter-spacing: 0.14em; text-transform: uppercase;
+          cursor: pointer; transition: all 0.22s ease;
+          font-family: 'DM Sans', sans-serif;
+          border-radius: 1px;
+        }
+        .cur-btn-cancel {
+          background: transparent;
+          border: 0.5px solid ${border};
+          color: ${muted};
+        }
+        .cur-btn-cancel:hover {
+          border-color: rgba(255,255,255,0.2);
+          color: ${text};
+        }
+        .cur-btn-update {
+          background: transparent;
+          border: 0.5px solid ${gold};
+          color: ${gold};
+        }
+        .cur-btn-update:hover {
+          background: ${gold};
+          color: #0a0a0a;
+          box-shadow: 0 0 20px rgba(201,168,76,0.2);
+          letter-spacing: 0.18em;
+        }
+        .cur-close-btn {
+          width: 30px; height: 30px;
+          border: 0.5px solid ${border};
+          background: transparent;
+          color: ${muted}; font-size: 16px;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.2s ease; border-radius: 1px; flex-shrink: 0;
+        }
+        .cur-close-btn:hover {
+          border-color: rgba(192,120,120,0.5);
+          color: #c07878;
+        }
+      `}</style>
+
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.78)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '20px'
+      }}>
         <div style={{
-            position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'rgba(10,10,30,0.75)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '20px'
+          background: '#111110',
+          border: `0.5px solid ${border}`,
+          width: '100%', maxWidth: '400px',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
+          animation: 'curSlideUp 0.25s ease',
+          overflow: 'hidden', borderRadius: '1px',
+          position: 'relative'
         }}>
-            <div style={{
-                background: 'linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)',
-                borderRadius: '24px',
-                width: '100%',
-                maxWidth: '420px',
-                boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                overflow: 'hidden'
-            }}>
-                {/* Header */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '22px 26px',
-                    borderBottom: '1px solid rgba(255,255,255,0.08)'
-                }}>
-                    <div>
-                        <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '18px', margin: 0 }}>
-                            Change User Role
-                        </h2>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '3px 0 0' }}>
-                            Update permissions for this user
-                        </p>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            background: 'rgba(255,255,255,0.08)', border: 'none',
-                            borderRadius: '10px', color: 'rgba(255,255,255,0.7)',
-                            fontSize: '18px', cursor: 'pointer',
-                            width: '36px', height: '36px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(245,87,108,0.25)'; e.currentTarget.style.color = '#f5576c' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
-                    >
-                        <IoMdClose />
-                    </button>
-                </div>
 
-                {/* Body */}
-                <div style={{ padding: '26px' }}>
+          {/* Gold top accent */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            height: '1.5px', background: gold
+          }} />
 
-                    {/* User Info Card */}
-                    <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '14px',
-                        padding: '16px',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        marginBottom: '22px',
-                        display: 'flex', alignItems: 'center', gap: '14px'
-                    }}>
-                        <div style={{
-                            width: '46px', height: '46px', borderRadius: '50%', flexShrink: 0,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '18px', fontWeight: 800, color: '#fff'
-                        }}>
-                            {name?.charAt(0)?.toUpperCase()}
-                        </div>
-                        <div>
-                            <p style={{ color: '#fff', fontWeight: 700, fontSize: '15px', margin: '0 0 3px' }}>{name}</p>
-                            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px', margin: 0 }}>{email}</p>
-                        </div>
-                    </div>
-
-                    {/* Role Selector */}
-                    <div style={{ marginBottom: '24px' }}>
-                        <label style={{
-                            fontSize: '11px', fontWeight: 700, letterSpacing: '1px',
-                            textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)',
-                            display: 'block', marginBottom: '8px'
-                        }}>
-                            Select Role
-                        </label>
-                        <select
-                            value={userRole}
-                            onChange={e => setUserRole(e.target.value)}
-                            style={{
-                                width: '100%', padding: '11px 14px',
-                                background: 'rgba(255,255,255,0.07)',
-                                border: '1px solid rgba(255,255,255,0.13)',
-                                borderRadius: '10px', color: '#fff',
-                                fontSize: '14px', outline: 'none', cursor: 'pointer'
-                            }}
-                            onFocus={e => e.target.style.border = '1px solid #667eea'}
-                            onBlur={e => e.target.style.border = '1px solid rgba(255,255,255,0.13)'}
-                        >
-                            {Object.values(ROLE).map(el => (
-                                <option key={el} value={el} style={{ background: '#1a1a2e' }}>{el}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Buttons */}
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                            onClick={onClose}
-                            style={{
-                                flex: 1, padding: '12px',
-                                background: 'rgba(255,255,255,0.07)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '12px', color: 'rgba(255,255,255,0.7)',
-                                fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-                                transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={updateUserRole}
-                            style={{
-                                flex: 1, padding: '12px',
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                border: 'none', borderRadius: '12px',
-                                color: '#fff', fontSize: '14px', fontWeight: 700,
-                                cursor: 'pointer', transition: 'all 0.2s',
-                                boxShadow: '0 4px 16px rgba(102,126,234,0.35)'
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(102,126,234,0.45)' }}
-                            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(102,126,234,0.35)' }}
-                        >
-                            Update Role
-                        </button>
-                    </div>
-                </div>
+          {/* Header */}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+            padding: '22px 24px 20px',
+            borderBottom: `0.5px solid ${border}`
+          }}>
+            <div>
+              <h2 style={{
+                fontFamily: 'Cormorant Garamond, Georgia, serif',
+                fontSize: '22px', fontWeight: 300,
+                color: text, margin: '0 0 4px', letterSpacing: '-0.01em'
+              }}>
+                Change User Role
+              </h2>
+              <p style={{
+                color: muted, fontSize: '11px', margin: 0,
+                letterSpacing: '0.04em', fontFamily: 'DM Sans, sans-serif'
+              }}>
+                Update permissions for this user
+              </p>
             </div>
+            <button className="cur-close-btn" onClick={onClose} aria-label="Close">
+              <IoMdClose />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div style={{ padding: '24px' }}>
+
+            {/* User info */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '14px',
+              padding: '14px 16px',
+              border: `0.5px solid ${goldBorder}`,
+              background: goldBg,
+              marginBottom: '22px'
+            }}>
+              {/* Avatar */}
+              <div style={{
+                width: '40px', height: '40px', flexShrink: 0,
+                border: `0.5px solid ${goldBorder}`,
+                background: 'rgba(201,168,76,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: gold, fontSize: '16px', fontWeight: 500,
+                fontFamily: 'DM Sans, sans-serif'
+              }}>
+                {name?.charAt(0)?.toUpperCase()}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{
+                  color: text, fontWeight: 400, fontSize: '13px',
+                  margin: '0 0 3px', letterSpacing: '0.02em',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  fontFamily: 'DM Sans, sans-serif'
+                }}>
+                  {name}
+                </p>
+                <p style={{
+                  color: muted, fontSize: '11px', margin: 0,
+                  letterSpacing: '0.02em',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  fontFamily: 'DM Sans, sans-serif'
+                }}>
+                  {email}
+                </p>
+              </div>
+            </div>
+
+            {/* Role selector */}
+            <div style={{ marginBottom: '22px' }}>
+              <label style={{
+                fontSize: '9px', fontWeight: 500,
+                letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: muted, display: 'block', marginBottom: '8px',
+                fontFamily: 'DM Sans, sans-serif'
+              }}>
+                Select Role
+              </label>
+              <select
+                value={userRole}
+                onChange={e => setUserRole(e.target.value)}
+                className="cur-select"
+              >
+                {Object.values(ROLE).map(el => (
+                  <option key={el} value={el}>{el}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '1px' }}>
+              <button className="cur-btn cur-btn-cancel" onClick={onClose}>
+                Cancel
+              </button>
+              <button className="cur-btn cur-btn-update" onClick={updateUserRole}>
+                Update Role
+              </button>
+            </div>
+          </div>
         </div>
-    )
+      </div>
+    </>
+  )
 }
 
 export default ChangeUserRole

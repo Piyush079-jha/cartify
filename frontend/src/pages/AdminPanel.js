@@ -1,194 +1,196 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { FaUsers, FaBox } from "react-icons/fa"
-import { FaRegCircleUser } from "react-icons/fa6"
+import { FaUsers, FaBox } from 'react-icons/fa'
+import { FaRegCircleUser } from 'react-icons/fa6'
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import ROLE from '../common/role'
 
 const AdminPanel = () => {
-  const user = useSelector(state => state?.user?.user)
+  const user     = useSelector(state => state?.user?.user)
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
-    if (user?.role !== ROLE.ADMIN) {
-      navigate("/")
-    }
+    if (user?.role !== ROLE.ADMIN) navigate('/')
   }, [user])
 
   const navItems = [
-    { path: 'all-products', label: 'All Products', icon: <FaBox /> },
-    { path: 'all-users', label: 'All Users', icon: <FaUsers /> },
+    { path: 'all-products', label: 'All Products', icon: <FaBox style={{ fontSize: '12px' }} /> },
+    { path: 'all-users',    label: 'All Users',    icon: <FaUsers style={{ fontSize: '12px' }} /> },
   ]
 
   const isActive = (path) => location.pathname.includes(path)
 
+  const gold       = '#c9a84c'
+  const border     = 'rgba(255,255,255,0.07)'
+  const muted      = 'rgba(160,152,144,0.7)'
+  const text       = '#e8e4dc'
+  const goldBg     = 'rgba(201,168,76,0.07)'
+  const goldBorder = 'rgba(201,168,76,0.22)'
+
   return (
-    <div style={{
-      minHeight: 'calc(100vh - 72px)',
-      display: 'flex',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)' // ✅ Fixed: was '#f4f6fb'
-    }}>
+    <>
+      <style>{`
+        .ap-nav-link {
+          display: flex; align-items: center; gap: 10px;
+          padding: 10px 14px;
+          text-decoration: none;
+          font-size: 12px; font-weight: 400;
+          letter-spacing: 0.04em;
+          font-family: 'DM Sans', sans-serif;
+          border-left: 1.5px solid transparent;
+          transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+          position: relative;
+        }
+        .ap-nav-link:hover:not(.active-link) {
+          background: rgba(255,255,255,0.03);
+          color: ${text} !important;
+        }
+        .ap-nav-link.active-link {
+          border-left-color: ${gold};
+          background: ${goldBg};
+          color: ${gold} !important;
+        }
+        .ap-back-link {
+          display: flex; align-items: center; gap: 8px;
+          padding: 9px 14px;
+          text-decoration: none;
+          font-size: 10px; letter-spacing: 0.1em;
+          text-transform: uppercase;
+          font-family: 'DM Sans', sans-serif;
+          border: 0.5px solid ${border};
+          color: ${muted};
+          transition: all 0.2s ease;
+          border-radius: 1px;
+          margin: 0 16px;
+        }
+        .ap-back-link:hover {
+          border-color: ${goldBorder};
+          color: ${gold};
+        }
+        @media (max-width: 768px) {
+          .ap-sidebar { width: 200px !important; min-width: 200px !important; }
+          .ap-main    { padding: 16px !important; }
+        }
+        @media (max-width: 560px) {
+          .ap-sidebar { display: none !important; }
+        }
+      `}</style>
 
-      {/* Sidebar */}
-      <aside style={{
-        width: '260px',
-        minWidth: '260px',
-        background: 'linear-gradient(180deg, #12122a 0%, #0e1836 60%, #0a2847 100%)',
-        minHeight: '100%',
+      <div style={{
+        minHeight: 'calc(100vh - 72px)',
         display: 'flex',
-        flexDirection: 'column',
-        padding: '24px 0',
-        boxShadow: '4px 0 24px rgba(0,0,0,0.3)',
-        borderRight: '1px solid rgba(255,255,255,0.07)'
+        background: '#0e0e0e'
       }}>
 
-        {/* Admin Profile */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '24px 20px 32px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        {/* Sidebar */}
+        <aside className="ap-sidebar" style={{
+          width: '220px', minWidth: '220px',
+          background: '#111110',
+          borderRight: `0.5px solid ${border}`,
+          display: 'flex', flexDirection: 'column',
+          height: 'calc(100vh - 72px)',
+          position: 'sticky', top: '72px',
+          overflow: 'hidden'
         }}>
+
+          {/* Top accent */}
+          <div style={{ height: '1.5px', background: gold, flexShrink: 0 }} />
+
+          {/* Admin profile */}
           <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '36px',
-            color: '#fff',
-            marginBottom: '12px',
-            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
-            border: '3px solid rgba(255,255,255,0.2)'
+            padding: '24px 20px 20px',
+            borderBottom: `0.5px solid ${border}`,
+            flexShrink: 0
           }}>
-            {user?.profilePic ? (
-              <img src={user?.profilePic} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} alt={user?.name} />
-            ) : (
-              <FaRegCircleUser />
-            )}
+            {/* Avatar */}
+            <div style={{
+              width: '48px', height: '48px',
+              border: `0.5px solid ${goldBorder}`,
+              background: goldBg,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '22px', color: gold,
+              marginBottom: '12px', overflow: 'hidden'
+            }}>
+              {user?.profilePic
+                ? <img src={user.profilePic} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} />
+                : <FaRegCircleUser />
+              }
+            </div>
+
+            <p style={{
+              color: text, fontSize: '13px', fontWeight: 400,
+              margin: '0 0 6px', letterSpacing: '0.02em',
+              fontFamily: 'DM Sans, sans-serif',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+            }}>
+              {user?.name}
+            </p>
+
+            <span style={{
+              display: 'inline-block',
+              border: `0.5px solid ${goldBorder}`,
+              background: goldBg,
+              color: gold,
+              fontSize: '8.5px', fontWeight: 500,
+              padding: '2px 8px',
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              fontFamily: 'DM Sans, sans-serif'
+            }}>
+              Admin
+            </span>
           </div>
-          <p style={{
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: '16px',
-            textTransform: 'capitalize',
-            margin: '0 0 4px'
-          }}>
-            {user?.name}
-          </p>
-          <span style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: '#fff',
-            fontSize: '11px',
-            fontWeight: 700,
-            padding: '3px 12px',
-            borderRadius: '20px',
-            letterSpacing: '1px'
-          }}>
-            👑 ADMIN
-          </span>
-        </div>
 
-        {/* Nav Links */}
-        <nav style={{ padding: '20px 12px', flex: 1 }}>
-          <p style={{
-            color: 'rgba(255,255,255,0.4)',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '2px',
-            padding: '0 12px',
-            marginBottom: '12px',
-            textTransform: 'uppercase'
-          }}>
-            Management
-          </p>
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                marginBottom: '6px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: isActive(item.path) ? '#fff' : 'rgba(255,255,255,0.65)',
-                background: isActive(item.path)
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'transparent',
-                boxShadow: isActive(item.path)
-                  ? '0 4px 16px rgba(102, 126, 234, 0.35)'
-                  : 'none',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={e => {
-                if (!isActive(item.path)) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
-                  e.currentTarget.style.color = '#fff'
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isActive(item.path)) {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.65)'
-                }
-              }}
-            >
-              <span style={{ fontSize: '16px' }}>{item.icon}</span>
-              {item.label}
+          {/* Nav */}
+          <nav style={{ flex: 1, paddingTop: '16px', overflow: 'hidden' }}>
+            <p style={{
+              fontSize: '8.5px', fontWeight: 400, letterSpacing: '0.18em',
+              textTransform: 'uppercase', color: muted,
+              margin: '0 0 8px', padding: '0 14px',
+              fontFamily: 'DM Sans, sans-serif'
+            }}>
+              Management
+            </p>
+
+            {navItems.map(item => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`ap-nav-link${isActive(item.path) ? ' active-link' : ''}`}
+                style={{ color: isActive(item.path) ? gold : muted }}
+              >
+                {item.icon}
+                {item.label}
+                {isActive(item.path) && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    width: '4px', height: '4px',
+                    borderRadius: '50%',
+                    background: gold, flexShrink: 0
+                  }} />
+                )}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Back to store */}
+          <div style={{ padding: '16px 0', borderTop: `0.5px solid ${border}`, flexShrink: 0 }}>
+            <Link to="/" className="ap-back-link">
+              ← Back to Store
             </Link>
-          ))}
-        </nav>
+          </div>
+        </aside>
 
-        {/* Back to Store */}
-        <div style={{ padding: '12px' }}>
-          <Link
-            to="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '12px 16px',
-              borderRadius: '12px',
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.5)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = '#fff'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-            }}
-          >
-            ← Back to Store
-          </Link>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main style={{
-        flex: 1,
-        padding: '28px',
-        overflowY: 'auto',
-        background: 'transparent'  
-      }}>
-        <Outlet />
-      </main>
-    </div>
+        {/* Main */}
+        <main className="ap-main" style={{
+          flex: 1, padding: '28px',
+          overflowY: 'auto',
+          background: '#0e0e0e'
+        }}>
+          <Outlet />
+        </main>
+      </div>
+    </>
   )
 }
 
