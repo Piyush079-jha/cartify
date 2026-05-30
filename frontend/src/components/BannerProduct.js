@@ -12,96 +12,138 @@ import image5Mobile from '../assest/banner/img5_mobile.png'
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6"
 
 const BannerProduct = ({ isDark = false }) => {
-    const [currentImage, setCurrentImage] = useState(0)
-    const [isHovering, setIsHovering] = useState(false)
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+  const [currentImage, setCurrentImage] = useState(0)
+  const [isHovering, setIsHovering] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
-    const desktopImages = [image1, image2, image3, image4, image5]
-    const mobileImages = [image1Mobile, image2Mobile, image3Mobile, image4Mobile, image5Mobile]
-    const images = isMobile ? mobileImages : desktopImages
+  const desktopImages = [image1, image2, image3, image4, image5]
+  const mobileImages  = [image1Mobile, image2Mobile, image3Mobile, image4Mobile, image5Mobile]
+  const images = isMobile ? mobileImages : desktopImages
 
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 640)
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.1)'
+  const gold   = '#c9a84c'
 
-    const nextImage = () => { if (images.length - 1 > currentImage) setCurrentImage(prev => prev + 1) }
-    const prevImage = () => { if (currentImage !== 0) setCurrentImage(prev => prev - 1) }
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
-    useEffect(() => {
-        if (!isHovering) {
-            const interval = setInterval(() => {
-                if (images.length - 1 > currentImage) nextImage()
-                else setCurrentImage(0)
-            }, 5000)
-            return () => clearInterval(interval)
+  const nextImage = () => setCurrentImage(p => p < images.length - 1 ? p + 1 : 0)
+  const prevImage = () => setCurrentImage(p => p > 0 ? p - 1 : images.length - 1)
+
+  useEffect(() => {
+    if (!isHovering) {
+      const interval = setInterval(nextImage, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [currentImage, isHovering, images.length])
+
+  return (
+    <>
+      <style>{`
+        .bnr-nav { opacity: 0; transition: opacity 0.3s ease; }
+        .bnr-wrap:hover .bnr-nav { opacity: 1; }
+        .bnr-btn {
+          width: 36px; height: 36px; border: 0.5px solid rgba(255,255,255,0.4);
+          background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; color: #fff; font-size: 13px;
+          transition: all 0.2s ease; border-radius: 1px;
         }
-    }, [currentImage, isHovering, images.length])
+        .bnr-btn:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.7); }
+        @media (max-width: 768px) {
+          .bnr-outer { padding: 0 20px !important; margin: 0 !important; }
+          .bnr-inner { height: 220px !important; }
+        }
+        @media (max-width: 480px) {
+          .bnr-outer { padding: 0 !important; }
+          .bnr-inner { height: 180px !important; }
+        }
+      `}</style>
 
-    return (
-        <>
-            <style>{`
-                .banner-wrap { max-width: 1280px; margin: 20px auto; padding: 0 20px; }
-                .banner-inner { height: 280px; width: 100%; position: relative; border-radius: 24px; overflow: hidden; }
-                .banner-nav-btn { border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.3s ease; }
+      {/* Editorial headline above banner */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 20px' }}>
+        <p style={{
+          fontSize: isMobile ? '28px' : '42px',
+          fontWeight: 300, letterSpacing: '-0.02em',
+          color: isDark ? '#e8e4dc' : '#1a1814',
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          lineHeight: 1.2, margin: 0, maxWidth: '480px'
+        }}>
+          Discover what's<br />
+          <em style={{ fontStyle: 'italic', color: '#c9a84c' }}>new this season</em>
+        </p>
+      </div>
 
-                @media (max-width: 768px) {
-                    .banner-wrap { margin: 14px auto; padding: 0 12px; }
-                    .banner-inner { height: 200px !important; border-radius: 18px !important; }
-                    .banner-nav-btn { width: 34px !important; height: 34px !important; font-size: 14px !important; }
-                }
-                @media (max-width: 480px) {
-                    .banner-inner { height: 160px !important; border-radius: 14px !important; }
-                    .banner-nav-btn { width: 28px !important; height: 28px !important; font-size: 12px !important; }
-                    .banner-wrap { padding: 0 8px; margin: 10px auto; }
-                }
-            `}</style>
-
-            <div className="banner-wrap">
-                <div className="banner-inner"
-                    style={{ boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.15)' }}
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => setIsHovering(false)}
-                >
-                    {/* Nav Buttons */}
-                    <div style={{ position: 'absolute', zIndex: 10, height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 12px', opacity: isHovering ? 1 : 0, transition: 'opacity 0.3s ease', pointerEvents: isHovering ? 'auto' : 'none' }}>
-                        <button className="banner-nav-btn" onClick={prevImage}
-                            style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', color: isDark ? '#fff' : '#333', boxShadow: '0 4px 16px rgba(0,0,0,0.15)', transform: isHovering ? 'translateX(0)' : 'translateX(-20px)' }}
-                            onMouseEnter={e => { e.currentTarget.style.background = '#e53935'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'scale(1.1)' }}
-                            onMouseLeave={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)'; e.currentTarget.style.color = isDark ? '#fff' : '#333'; e.currentTarget.style.transform = 'scale(1)' }}
-                        ><FaAngleLeft /></button>
-                        <button className="banner-nav-btn" onClick={nextImage}
-                            style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', color: isDark ? '#fff' : '#333', boxShadow: '0 4px 16px rgba(0,0,0,0.15)', transform: isHovering ? 'translateX(0)' : 'translateX(20px)' }}
-                            onMouseEnter={e => { e.currentTarget.style.background = '#e53935'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'scale(1.1)' }}
-                            onMouseLeave={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)'; e.currentTarget.style.color = isDark ? '#fff' : '#333'; e.currentTarget.style.transform = 'scale(1)' }}
-                        ><FaAngleRight /></button>
-                    </div>
-
-                    {/* Images */}
-                    <div style={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
-                        {images.map((imageUrl, index) => (
-                            <div key={index} style={{ width: '100%', height: '100%', minWidth: '100%', transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${currentImage * 100}%)`, position: 'relative' }}>
-                                <img src={imageUrl} alt={`Banner ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isDark ? 'brightness(0.85)' : 'none' }} />
-                                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: isDark ? 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)' : 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)', pointerEvents: 'none' }} />
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Dots */}
-                    <div style={{ position: 'absolute', bottom: '14px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px', zIndex: 10 }}>
-                        {images.map((_, index) => (
-                            <button key={index} onClick={() => setCurrentImage(index)}
-                                style={{ width: currentImage === index ? '22px' : '7px', height: '7px', borderRadius: '4px', border: 'none', background: currentImage === index ? '#fff' : 'rgba(255,255,255,0.5)', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: currentImage === index ? '0 2px 8px rgba(0,0,0,0.3)' : 'none', padding: 0 }}
-                                onMouseEnter={e => { if (currentImage !== index) e.target.style.background = 'rgba(255,255,255,0.8)' }}
-                                onMouseLeave={e => { if (currentImage !== index) e.target.style.background = 'rgba(255,255,255,0.5)' }}
-                            />
-                        ))}
-                    </div>
+      <div className="bnr-outer" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 40px' }}>
+        <div
+          className="bnr-wrap"
+          style={{ position: 'relative' }}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          {/* Main image area */}
+          <div className="bnr-inner" style={{
+            height: '420px', width: '100%', overflow: 'hidden',
+            border: `0.5px solid ${border}`, position: 'relative'
+          }}>
+            <div style={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
+              {images.map((imageUrl, index) => (
+                <div key={index} style={{
+                  width: '100%', height: '100%', minWidth: '100%',
+                  transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: `translateX(-${currentImage * 100}%)`
+                }}>
+                  <img src={imageUrl} alt={`Banner ${index + 1}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                      filter: isDark ? 'brightness(0.8)' : 'none' }} />
                 </div>
+              ))}
             </div>
-        </>
-    )
+
+            {/* Subtle bottom gradient */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.35), transparent)', pointerEvents: 'none' }} />
+
+            {/* Nav buttons */}
+            <div className="bnr-nav" style={{
+              position: 'absolute', zIndex: 10, height: '100%', width: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '0 16px', top: 0, pointerEvents: 'none'
+            }}>
+              <button className="bnr-btn" onClick={prevImage} style={{ pointerEvents: 'auto' }}><FaAngleLeft /></button>
+              <button className="bnr-btn" onClick={nextImage} style={{ pointerEvents: 'auto' }}><FaAngleRight /></button>
+            </div>
+          </div>
+
+          {/* Bottom bar — dots + counter */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 0 0'
+          }}>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {images.map((_, index) => (
+                <button key={index} onClick={() => setCurrentImage(index)}
+                  style={{
+                    width: currentImage === index ? '20px' : '5px',
+                    height: '1px', border: 'none', padding: 0, cursor: 'pointer',
+                    background: currentImage === index ? gold : (isDark ? 'rgba(255,255,255,0.25)' : 'rgba(26,24,20,0.2)'),
+                    transition: 'all 0.3s ease'
+                  }} />
+              ))}
+            </div>
+            <span style={{
+              fontSize: '11px', letterSpacing: '0.1em',
+              color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(26,24,20,0.3)'
+            }}>
+              {String(currentImage + 1).padStart(2,'0')} / {String(images.length).padStart(2,'0')}
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
 
 export default BannerProduct

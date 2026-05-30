@@ -14,6 +14,12 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
     const scrollElement = useRef()
     const { fetchUserAddToCart } = useContext(Context)
 
+    const surface = isDark ? '#161616' : '#ffffff'
+    const text     = isDark ? '#e8e4dc' : '#1a1814'
+    const muted    = isDark ? '#666' : '#aaa'
+    const border   = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.09)'
+    const gold     = '#c9a84c'
+
     const handleAddToCart = async (e, id) => {
         await addToCart(e, id)
         fetchUserAddToCart()
@@ -28,122 +34,83 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
 
     useEffect(() => { fetchData() }, [fetchData])
 
-    const scrollRight = () => { scrollElement.current.scrollLeft += 300 }
-    const scrollLeft = () => { scrollElement.current.scrollLeft -= 300 }
+    const scrollRight = () => { scrollElement.current.scrollLeft += 320 }
+    const scrollLeft  = () => { scrollElement.current.scrollLeft -= 320 }
 
     return (
         <>
             <style>{`
-                .hcp-wrapper {
-                    max-width: 1280px;
-                    margin: 40px auto;
-                    padding: 0 24px;
-                    position: relative;
-                }
+                .hcp-wrap { max-width:1400px; margin:0 auto; padding:32px 32px 0; position:relative; }
                 .hcp-card {
-                    min-width: 320px;
-                    max-width: 320px;
-                    height: 200px;
-                    display: flex;
-                    overflow: hidden;
-                    border-radius: 18px;
-                    text-decoration: none;
-                    flex-shrink: 0;
-                    transition: all 0.3s ease;
+                    min-width:300px; max-width:300px; height:160px;
+                    display:flex; overflow:hidden; flex-shrink:0;
+                    text-decoration:none; transition:border-color 0.2s ease, box-shadow 0.2s ease;
+                    border:0.5px solid ${border}; background:${surface};
                 }
+                .hcp-card:hover { border-color:${gold}; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
+                .hcp-add-btn {
+                    width:100%; padding:8px 0; border:0.5px solid ${border};
+                    background:transparent; color:${muted};
+                    font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+                    cursor:pointer; transition:all 0.2s ease; font-family:inherit;
+                }
+                .hcp-add-btn:hover { border-color:${gold}; color:${gold}; background:rgba(201,168,76,0.04); }
                 .hcp-scroll-btn {
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    z-index: 10;
-                    border: none;
-                    border-radius: 50%;
-                    width: 40px;
-                    height: 40px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    font-size: 16px;
-                    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-                    transition: all 0.3s ease;
+                    position:absolute; top:50%; transform:translateY(-50%);
+                    z-index:10; border:0.5px solid ${border};
+                    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+                    cursor:pointer; font-size:12px; transition:all 0.2s ease;
+                    background:${surface}; color:${muted};
                 }
-                @media (max-width: 768px) {
-                    .hcp-wrapper {
-                        padding: 0 14px;
-                        margin: 28px auto;
-                    }
-                    .hcp-card {
-                        min-width: 260px;
-                        max-width: 260px;
-                        height: 175px;
-                    }
-                    .hcp-img {
-                        width: 120px !important;
-                    }
-                    .hcp-scroll-btn {
-                        width: 32px;
-                        height: 32px;
-                        font-size: 13px;
-                    }
-                    .hcp-heading { font-size: 18px !important; }
-                    .hcp-viewall { font-size: 12px !important; padding: 6px 12px !important; }
-                    .hcp-price { font-size: 15px !important; }
-                    .hcp-name { font-size: 13px !important; }
-                    .hcp-btn { font-size: 12px !important; padding: 8px 6px !important; }
+                .hcp-scroll-btn:hover { border-color:${gold}; color:${gold}; }
+                @media (max-width:768px) {
+                    .hcp-wrap { padding:24px 20px 0; }
+                    .hcp-card { min-width:260px; max-width:260px; height:145px; }
+                    .hcp-img-box { width:110px !important; }
                 }
-                @media (max-width: 480px) {
-                    .hcp-wrapper { padding: 0 10px; margin: 20px auto; }
-                    .hcp-card { min-width: 220px; max-width: 220px; height: 160px; }
-                    .hcp-img { width: 100px !important; }
+                @media (max-width:480px) {
+                    .hcp-card { min-width:230px; max-width:230px; height:135px; }
+                    .hcp-img-box { width:95px !important; }
                 }
             `}</style>
 
-            <div className="hcp-wrapper">
+            <div className="hcp-wrap">
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                    <div>
-                        <h2 className="hcp-heading" style={{ fontSize: '22px', fontWeight: 700, color: isDark ? '#fff' : '#111', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
+                <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'20px' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
+                        <h2 style={{ fontSize:'18px', fontWeight:300, color:text, margin:0, letterSpacing:'-0.01em', fontFamily:'Georgia,"Times New Roman",serif' }}>
                             {heading}
                         </h2>
-                        <div style={{ width: '44px', height: '3px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }} />
+                        <div style={{ width:'1px', height:'16px', background:border }} />
+                        <span style={{ fontSize:'10px', letterSpacing:'0.12em', textTransform:'uppercase', color:muted }}>
+                            {data.length > 0 ? `${data.length} items` : ''}
+                        </span>
                     </div>
-                    <Link
-                        to={`/product-category?category=${category}`}
-                        className="hcp-viewall"
-                        style={{ fontSize: '13px', fontWeight: 600, color: '#667eea', textDecoration: 'none', padding: '7px 16px', borderRadius: '10px', background: isDark ? 'rgba(102,126,234,0.15)' : 'rgba(102,126,234,0.08)', transition: 'all 0.3s ease' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #667eea, #764ba2)'; e.currentTarget.style.color = '#fff' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = isDark ? 'rgba(102,126,234,0.15)' : 'rgba(102,126,234,0.08)'; e.currentTarget.style.color = '#667eea' }}
-                    >
-                        View All →
-                    </Link>
+                    <Link to={`/product-category?category=${category}`}
+                        style={{ fontSize:'11px', letterSpacing:'0.1em', textTransform:'uppercase', color:muted, textDecoration:'none', transition:'color 0.2s ease', paddingBottom:'2px', borderBottom:'0.5px solid transparent' }}
+                        onMouseEnter={e => { e.currentTarget.style.color=gold; e.currentTarget.style.borderBottomColor=gold }}
+                        onMouseLeave={e => { e.currentTarget.style.color=muted; e.currentTarget.style.borderBottomColor='transparent' }}
+                    >View All</Link>
                 </div>
 
-                {/* Scroll Buttons */}
-                <button className="hcp-scroll-btn" onClick={scrollLeft}
-                    style={{ left: '4px', background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)', color: isDark ? '#fff' : '#333' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #667eea, #764ba2)'; e.currentTarget.style.color = '#fff' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)'; e.currentTarget.style.color = isDark ? '#fff' : '#333' }}>
-                    <FaAngleLeft />
-                </button>
-                <button className="hcp-scroll-btn" onClick={scrollRight}
-                    style={{ right: '4px', background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)', color: isDark ? '#fff' : '#333' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #667eea, #764ba2)'; e.currentTarget.style.color = '#fff' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)'; e.currentTarget.style.color = isDark ? '#fff' : '#333' }}>
-                    <FaAngleRight />
-                </button>
+                {/* Hairline */}
+                <div style={{ height:'0.5px', background:border, marginBottom:'16px' }} />
+
+                {/* Scroll buttons */}
+                <button className="hcp-scroll-btn" onClick={scrollLeft}  style={{ left:'-16px' }}><FaAngleLeft /></button>
+                <button className="hcp-scroll-btn" onClick={scrollRight} style={{ right:'-16px' }}><FaAngleRight /></button>
 
                 {/* Cards */}
-                <div ref={scrollElement} style={{ display: 'flex', gap: '16px', overflowX: 'auto', scrollbarWidth: 'none', scrollBehavior: 'smooth', paddingBottom: '6px' }}>
+                <div ref={scrollElement} style={{ display:'flex', gap:'1px', overflowX:'auto', scrollbarWidth:'none', scrollBehavior:'smooth' }}>
                     {loading ? (
                         loadingList.map((_, i) => (
-                            <div key={i} className="hcp-card" style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #f0f0f0', opacity: 0.6 }}>
-                                <div className="hcp-img" style={{ width: '140px', background: isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f5', flexShrink: 0 }} />
-                                <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div style={{ height: '14px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '6px' }} />
-                                    <div style={{ height: '11px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '5px', width: '55%' }} />
-                                    <div style={{ height: '18px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '5px', width: '65%' }} />
-                                    <div style={{ height: '36px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '10px', marginTop: 'auto' }} />
+                            <div key={i} className="hcp-card" style={{ opacity:0.4 }}>
+                                <div className="hcp-img-box" style={{ width:'130px', background:isDark?'rgba(255,255,255,0.03)':'#f5f4f2', flexShrink:0 }} />
+                                <div style={{ flex:1, padding:'16px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                                    <div style={{ height:'11px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'80%' }} />
+                                    <div style={{ height:'9px',  background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'45%' }} />
+                                    <div style={{ height:'13px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'55%', marginTop:'auto' }} />
+                                    <div style={{ height:'28px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px' }} />
                                 </div>
                             </div>
                         ))
@@ -155,55 +122,56 @@ const HorizontalCardProduct = ({ category, heading, isDark = false }) => {
                                 : null
 
                             return (
-                                <Link
-                                    to={"product/" + product?._id}
-                                    key={product?._id}
+                                <Link to={"product/" + product?._id} key={product?._id}
                                     className="hcp-card"
                                     onMouseEnter={() => setHoveredId(product?._id)}
                                     onMouseLeave={() => setHoveredId(null)}
-                                    style={{
-                                        background: isDark ? 'rgba(255,255,255,0.05)' : '#fff',
-                                        border: isHovered ? '1.5px solid #667eea' : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #efefef',
-                                        boxShadow: isHovered ? '0 12px 32px rgba(102,126,234,0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
-                                        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-                                        position: 'relative'
-                                    }}
                                 >
-                                    {discount && (
-                                        <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'linear-gradient(135deg, #f093fb, #f5576c)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '7px', zIndex: 2 }}>
-                                            {discount}% OFF
-                                        </div>
-                                    )}
-
                                     {/* Image */}
-                                    <div className="hcp-img" style={{ width: '140px', flexShrink: 0, background: isDark ? 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06))' : 'linear-gradient(135deg, #fafafa, #f2f2f2)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px', overflow: 'hidden' }}>
+                                    <div className="hcp-img-box" style={{
+                                        width:'130px', flexShrink:0,
+                                        background:isDark?'rgba(255,255,255,0.02)':'#f7f6f4',
+                                        display:'flex', alignItems:'center', justifyContent:'center',
+                                        padding:'16px', overflow:'hidden', position:'relative',
+                                        borderRight:`0.5px solid ${border}`
+                                    }}>
+                                        {discount && (
+                                            <div style={{
+                                                position:'absolute', top:'8px', left:'8px',
+                                                background:isDark?'rgba(201,168,76,0.15)':'rgba(201,168,76,0.12)',
+                                                color:gold, fontSize:'9px', fontWeight:500,
+                                                padding:'2px 6px', letterSpacing:'0.06em'
+                                            }}>−{discount}%</div>
+                                        )}
                                         <img src={product.productImage[0]} alt={product.productName}
-                                            style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: isDark ? 'lighten' : 'multiply', transition: 'transform 0.4s ease', transform: isHovered ? 'scale(1.1)' : 'scale(1)' }} />
+                                            style={{ width:'100%', height:'100%', objectFit:'contain',
+                                                mixBlendMode:isDark?'lighten':'multiply',
+                                                transition:'transform 0.35s ease',
+                                                transform:isHovered?'scale(1.07)':'scale(1)' }} />
                                     </div>
 
                                     {/* Info */}
-                                    <div style={{ flex: 1, padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+                                    <div style={{ flex:1, padding:'14px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between', minWidth:0 }}>
                                         <div>
-                                            <h3 className="hcp-name" style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#fff' : '#111', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: '1.4' }}>
+                                            <p style={{ fontSize:'9px', color:gold, letterSpacing:'0.1em', textTransform:'uppercase', margin:'0 0 5px', fontWeight:400 }}>
+                                                {product?.category}
+                                            </p>
+                                            <h3 style={{ fontSize:'12px', fontWeight:400, color:text, margin:0, overflow:'hidden', textOverflow:'ellipsis', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', lineHeight:1.5, letterSpacing:'0.01em' }}>
                                                 {product?.productName}
                                             </h3>
-                                            <p style={{ fontSize: '10px', color: '#667eea', fontWeight: 600, margin: 0, textTransform: 'capitalize' }}>{product?.category}</p>
                                         </div>
                                         <div>
-                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                <span className="hcp-price" style={{ fontSize: '16px', fontWeight: 800, background: 'linear-gradient(135deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                            <div style={{ display:'flex', alignItems:'baseline', gap:'8px', marginBottom:'10px' }}>
+                                                <span style={{ fontSize:'15px', fontWeight:500, color:text, letterSpacing:'-0.01em' }}>
                                                     {displayINRCurrency(product?.sellingPrice)}
                                                 </span>
                                                 {product?.price !== product?.sellingPrice && (
-                                                    <span style={{ fontSize: '11px', color: isDark ? 'rgba(255,255,255,0.35)' : '#bbb', textDecoration: 'line-through' }}>
+                                                    <span style={{ fontSize:'11px', color:muted, textDecoration:'line-through' }}>
                                                         {displayINRCurrency(product?.price)}
                                                     </span>
                                                 )}
                                             </div>
-                                            <button className="hcp-btn" onClick={(e) => handleAddToCart(e, product?._id)}
-                                                style={{ width: '100%', padding: '8px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #667eea, #764ba2)', color: '#fff', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 4px 14px rgba(102,126,234,0.28)', fontFamily: 'inherit' }}
-                                                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(102,126,234,0.4)' }}
-                                                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(102,126,234,0.28)' }}>
+                                            <button className="hcp-add-btn" onClick={(e) => handleAddToCart(e, product?._id)}>
                                                 Add to Cart
                                             </button>
                                         </div>

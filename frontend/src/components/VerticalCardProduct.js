@@ -11,9 +11,17 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
     const [wishlist, setWishlist] = useState({})
+    const [hoveredId, setHoveredId] = useState(null)
     const loadingList = new Array(6).fill(null)
     const scrollElement = useRef()
     const { fetchUserAddToCart } = useContext(Context)
+
+    const bg      = isDark ? '#0e0e0e' : '#faf9f7'
+    const surface = isDark ? '#161616' : '#ffffff'
+    const text    = isDark ? '#e8e4dc' : '#1a1814'
+    const muted   = isDark ? '#666' : '#aaa'
+    const border  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.09)'
+    const gold    = '#c9a84c'
 
     const handleAddToCart = async (e, id) => {
         await addToCart(e, id)
@@ -33,318 +41,178 @@ const VerticalCardProduct = ({ category, heading, isDark = false }) => {
 
     useEffect(() => { fetchData() }, [fetchData])
 
-    const scrollRight = () => { scrollElement.current.scrollLeft += 300 }
-    const scrollLeft = () => { scrollElement.current.scrollLeft -= 300 }
-
-    const cardStyle = {
-        minWidth: '210px',
-        maxWidth: '210px',
-        background: isDark ? 'rgba(255,255,255,0.05)' : '#fff',
-        borderRadius: '20px',
-        overflow: 'hidden',
-        border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #efefef',
-        flexShrink: 0,
-        textDecoration: 'none',
-        transition: 'all 0.3s ease',
-        display: 'block',
-        position: 'relative',
-    }
+    const scrollRight = () => { scrollElement.current.scrollLeft += 240 }
+    const scrollLeft  = () => { scrollElement.current.scrollLeft -= 240 }
 
     return (
-        <div style={{
-            maxWidth: '1280px',
-            margin: '40px auto',
-            padding: '0 24px',
-            position: 'relative'
-        }}>
-            {/* Section Header */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '20px'
-            }}>
-                <div>
-                    <h2 style={{
-                        fontSize: '24px',
-                        fontWeight: 700,
-                        color: isDark ? '#fff' : '#111',
-                        margin: '0 0 6px 0',
-                        letterSpacing: '-0.5px'
-                    }}>
-                        {heading}
-                    </h2>
-                    <div style={{
-                        width: '50px',
-                        height: '3px',
-                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                        borderRadius: '2px'
-                    }} />
+        <>
+            <style>{`
+                .vcp-wrap { max-width:1400px; margin:0 auto; padding:40px 32px 0; position:relative; }
+                .vcp-card {
+                    min-width:210px; max-width:210px;
+                    display:flex; flex-direction:column; flex-shrink:0;
+                    overflow:hidden; text-decoration:none;
+                    border:0.5px solid ${border}; background:${surface};
+                    transition:border-color 0.25s ease, box-shadow 0.25s ease;
+                    position:relative;
+                }
+                .vcp-card:hover { border-color:${gold}; box-shadow:0 12px 40px rgba(0,0,0,0.09); }
+                .vcp-add-btn {
+                    width:100%; padding:10px 0; border:0.5px solid ${border};
+                    background:transparent; color:${muted};
+                    font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+                    cursor:pointer; transition:all 0.2s ease; font-family:inherit;
+                }
+                .vcp-add-btn:hover { border-color:${gold}; color:${gold}; background:rgba(201,168,76,0.04); }
+                .vcp-scroll-btn {
+                    position:absolute; top:50%; transform:translateY(-50%);
+                    z-index:10; border:0.5px solid ${border};
+                    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+                    cursor:pointer; font-size:12px; transition:all 0.2s ease;
+                    background:${surface}; color:${muted};
+                }
+                .vcp-scroll-btn:hover { border-color:${gold}; color:${gold}; }
+                @media (max-width:768px) {
+                    .vcp-wrap { padding:28px 20px 0; }
+                    .vcp-card { min-width:180px; max-width:180px; }
+                }
+                @media (max-width:480px) {
+                    .vcp-card { min-width:155px; max-width:155px; }
+                }
+            `}</style>
+
+            <div className="vcp-wrap">
+                {/* Header */}
+                <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'20px' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
+                        <h2 style={{ fontSize:'18px', fontWeight:300, color:text, margin:0, letterSpacing:'-0.01em', fontFamily:'Georgia,"Times New Roman",serif' }}>
+                            {heading}
+                        </h2>
+                        <div style={{ width:'1px', height:'16px', background:border }} />
+                        <span style={{ fontSize:'10px', letterSpacing:'0.12em', textTransform:'uppercase', color:muted }}>
+                            {data.length > 0 ? `${data.length} items` : ''}
+                        </span>
+                    </div>
+                    <Link
+                        to={`/product-category?category=${category}`}
+                        style={{ fontSize:'11px', letterSpacing:'0.1em', textTransform:'uppercase', color:muted, textDecoration:'none', transition:'color 0.2s ease', paddingBottom:'2px', borderBottom:'0.5px solid transparent' }}
+                        onMouseEnter={e => { e.currentTarget.style.color=gold; e.currentTarget.style.borderBottomColor=gold }}
+                        onMouseLeave={e => { e.currentTarget.style.color=muted; e.currentTarget.style.borderBottomColor='transparent' }}
+                    >View All</Link>
                 </div>
-                <Link
-                    to={`/product-category?category=${category}`}
-                    style={{
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        color: '#667eea',
-                        textDecoration: 'none',
-                        padding: '8px 18px',
-                        borderRadius: '10px',
-                        background: isDark ? 'rgba(102,126,234,0.15)' : 'rgba(102,126,234,0.08)',
-                        transition: 'all 0.3s ease',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                    }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        e.currentTarget.style.color = '#fff'
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.background = isDark ? 'rgba(102,126,234,0.15)' : 'rgba(102,126,234,0.08)'
-                        e.currentTarget.style.color = '#667eea'
-                    }}
-                >
-                    View All →
-                </Link>
-            </div>
 
-            {/* Scroll Buttons */}
-            {['left', 'right'].map(dir => (
-                <button
-                    key={dir}
-                    onClick={dir === 'left' ? scrollLeft : scrollRight}
-                    style={{
-                        position: 'absolute',
-                        [dir]: '4px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 10,
-                        background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)',
-                        backdropFilter: 'blur(10px)',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '44px',
-                        height: '44px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        fontSize: '18px',
-                        color: isDark ? '#fff' : '#333',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                        transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        e.currentTarget.style.color = '#fff'
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.95)'
-                        e.currentTarget.style.color = isDark ? '#fff' : '#333'
-                    }}
-                >
-                    {dir === 'left' ? <FaAngleLeft /> : <FaAngleRight />}
-                </button>
-            ))}
+                {/* Hairline */}
+                <div style={{ height:'0.5px', background:border, marginBottom:'16px' }} />
 
-            {/* Cards Container */}
-            <div
-                ref={scrollElement}
-                style={{
-                    display: 'flex',
-                    gap: '16px',
-                    overflowX: 'auto',
-                    scrollbarWidth: 'none',
-                    scrollBehavior: 'smooth',
-                    paddingBottom: '8px',
-                    paddingLeft: '2px',
-                    paddingRight: '2px'
-                }}
-            >
-                {loading ? (
-                    loadingList.map((_, index) => (
-                        <div key={index} style={{ ...cardStyle, opacity: 0.6 }}>
-                            <div style={{ height: '180px', background: isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f5' }} />
-                            <div style={{ padding: '14px', display: 'grid', gap: '10px' }}>
-                                <div style={{ height: '14px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '6px' }} />
-                                <div style={{ height: '11px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '5px', width: '60%' }} />
-                                <div style={{ height: '36px', background: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: '10px' }} />
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    data.map((product, index) => (
-                        <Link
-                            to={"product/" + product?._id}
-                            key={product?._id}
-                            style={cardStyle}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.boxShadow = '0 16px 36px rgba(102,126,234,0.22)'
-                                e.currentTarget.style.transform = 'translateY(-6px)'
-                                e.currentTarget.style.borderColor = 'rgba(102,126,234,0.35)'
-                            }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.boxShadow = 'none'
-                                e.currentTarget.style.transform = 'translateY(0)'
-                                e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#efefef'
-                            }}
-                        >
-                            {/* Wishlist */}
-                            <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 3 }}>
-                                <WishlistButton
-                                    productId={product?._id}
-                                    isInWishlist={wishlist[product?._id]}
-                                    onToggle={toggleWishlist}
-                                    isDark={isDark}
-                                />
-                            </div>
+                {/* Scroll buttons */}
+                <button className="vcp-scroll-btn" onClick={scrollLeft}  style={{ left:'-16px' }}><FaAngleLeft /></button>
+                <button className="vcp-scroll-btn" onClick={scrollRight} style={{ right:'-16px' }}><FaAngleRight /></button>
 
-                            {/* Discount Badge */}
-                            {product?.price !== product?.sellingPrice && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '10px',
-                                    right: '10px',
-                                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                                    color: '#fff',
-                                    fontSize: '10px',
-                                    fontWeight: 700,
-                                    padding: '4px 8px',
-                                    borderRadius: '8px',
-                                    zIndex: 2,
-                                    boxShadow: '0 3px 10px rgba(245,87,108,0.35)'
-                                }}>
-                                    {Math.round((product?.price - product?.sellingPrice) / product?.price * 100)}% OFF
+                {/* Cards */}
+                <div ref={scrollElement} style={{ display:'flex', gap:'1px', overflowX:'auto', scrollbarWidth:'none', scrollBehavior:'smooth', paddingBottom:'8px' }}>
+                    {loading ? (
+                        loadingList.map((_, i) => (
+                            <div key={i} className="vcp-card" style={{ opacity:0.4 }}>
+                                <div style={{ height:'200px', background:isDark?'rgba(255,255,255,0.03)':'#f5f4f2' }} />
+                                <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                                    <div style={{ height:'11px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'80%' }} />
+                                    <div style={{ height:'9px',  background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'40%' }} />
+                                    <div style={{ height:'14px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', width:'55%', marginTop:'8px' }} />
+                                    <div style={{ height:'32px', background:isDark?'rgba(255,255,255,0.06)':'#eeece8', borderRadius:'1px', marginTop:'4px' }} />
                                 </div>
-                            )}
-
-                            {/* Image */}
-                            <div style={{
-                                height: '180px',
-                                background: isDark
-                                    ? 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.05) 100%)'
-                                    : 'linear-gradient(135deg, #fafafa 0%, #f2f2f2 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '20px',
-                                overflow: 'hidden',
-                                position: 'relative'
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    width: '100px',
-                                    height: '100px',
-                                    background: 'rgba(102,126,234,0.08)',
-                                    borderRadius: '50%',
-                                    filter: 'blur(25px)',
-                                    top: '50%', left: '50%',
-                                    transform: 'translate(-50%,-50%)',
-                                    pointerEvents: 'none'
-                                }} />
-                                <img
-                                    src={product.productImage[0]}
-                                    alt={product.productName}
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'contain',
-                                        mixBlendMode: isDark ? 'lighten' : 'multiply',
-                                        transition: 'transform 0.4s ease',
-                                        position: 'relative',
-                                        zIndex: 1
-                                    }}
-                                    onMouseEnter={e => e.target.style.transform = 'scale(1.12)'}
-                                    onMouseLeave={e => e.target.style.transform = 'scale(1)'}
-                                />
                             </div>
+                        ))
+                    ) : (
+                        data.map((product) => {
+                            const isHovered = hoveredId === product?._id
+                            const discount = product?.price > product?.sellingPrice
+                                ? Math.round(((product.price - product.sellingPrice) / product.price) * 100)
+                                : null
 
-                            {/* Info */}
-                            <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                <h3 style={{
-                                    fontSize: '14px',
-                                    fontWeight: 600,
-                                    color: isDark ? '#fff' : '#111',
-                                    margin: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    lineHeight: '1.45',
-                                    minHeight: '40px'
-                                }}>
-                                    {product?.productName}
-                                </h3>
-
-                                <p style={{
-                                    fontSize: '11px',
-                                    color: isDark ? 'rgba(255,255,255,0.5)' : '#999',
-                                    margin: 0,
-                                    textTransform: 'capitalize',
-                                    fontWeight: 500
-                                }}>
-                                    {product?.category}
-                                </p>
-
-                                {/* Price */}
-                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
-                                    <span style={{
-                                        fontSize: '17px',
-                                        fontWeight: 700,
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundClip: 'text'
-                                    }}>
-                                        {displayINRCurrency(product?.sellingPrice)}
-                                    </span>
-                                    {product?.price !== product?.sellingPrice && (
-                                        <span style={{
-                                            fontSize: '12px',
-                                            color: isDark ? 'rgba(255,255,255,0.35)' : '#bbb',
-                                            textDecoration: 'line-through'
-                                        }}>
-                                            {displayINRCurrency(product?.price)}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Add to Cart */}
-                                <button
-                                    onClick={(e) => handleAddToCart(e, product?._id)}
-                                    style={{
-                                        marginTop: '6px',
-                                        padding: '10px',
-                                        borderRadius: '12px',
-                                        border: 'none',
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        color: '#fff',
-                                        fontSize: '13px',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        width: '100%',
-                                        boxShadow: '0 4px 14px rgba(102,126,234,0.28)'
-                                    }}
-                                    onMouseEnter={e => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)'
-                                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(102,126,234,0.4)'
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.transform = 'translateY(0)'
-                                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(102,126,234,0.28)'
-                                    }}
+                            return (
+                                <Link
+                                    to={"product/" + product?._id}
+                                    key={product?._id}
+                                    className="vcp-card"
+                                    onMouseEnter={() => setHoveredId(product?._id)}
+                                    onMouseLeave={() => setHoveredId(null)}
                                 >
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </Link>
-                    ))
-                )}
+                                    {/* Wishlist */}
+                                    <div style={{ position:'absolute', top:'10px', left:'10px', zIndex:3 }}>
+                                        <WishlistButton
+                                            productId={product?._id}
+                                            isInWishlist={wishlist[product?._id]}
+                                            onToggle={toggleWishlist}
+                                            isDark={isDark}
+                                        />
+                                    </div>
+
+                                    {/* Discount badge */}
+                                    {discount && (
+                                        <div style={{
+                                            position:'absolute', top:'10px', right:'10px',
+                                            background:isDark?'rgba(201,168,76,0.15)':'rgba(201,168,76,0.12)',
+                                            color:gold, fontSize:'9px', fontWeight:500,
+                                            padding:'2px 6px', letterSpacing:'0.06em', zIndex:2
+                                        }}>−{discount}%</div>
+                                    )}
+
+                                    {/* Image */}
+                                    <div style={{
+                                        height:'200px', flexShrink:0,
+                                        background:isDark?'rgba(255,255,255,0.02)':'#f7f6f4',
+                                        display:'flex', alignItems:'center', justifyContent:'center',
+                                        padding:'24px', overflow:'hidden',
+                                        borderBottom:`0.5px solid ${border}`
+                                    }}>
+                                        <img
+                                            src={product.productImage[0]}
+                                            alt={product.productName}
+                                            style={{
+                                                width:'100%', height:'100%', objectFit:'contain',
+                                                mixBlendMode:isDark?'lighten':'multiply',
+                                                transition:'transform 0.4s ease',
+                                                transform:isHovered?'scale(1.07)':'scale(1)'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Info */}
+                                    <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', flex:1 }}>
+                                        <p style={{ fontSize:'9px', color:gold, letterSpacing:'0.1em', textTransform:'uppercase', margin:'0 0 5px', fontWeight:400 }}>
+                                            {product?.category}
+                                        </p>
+                                        <h3 style={{
+                                            fontSize:'12px', fontWeight:400, color:text, margin:'0 0 auto',
+                                            overflow:'hidden', textOverflow:'ellipsis',
+                                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+                                            lineHeight:1.55, letterSpacing:'0.01em', minHeight:'37px'
+                                        }}>
+                                            {product?.productName}
+                                        </h3>
+
+                                        <div style={{ display:'flex', alignItems:'baseline', gap:'8px', margin:'12px 0 10px' }}>
+                                            <span style={{ fontSize:'15px', fontWeight:500, color:text, letterSpacing:'-0.01em' }}>
+                                                {displayINRCurrency(product?.sellingPrice)}
+                                            </span>
+                                            {product?.price !== product?.sellingPrice && (
+                                                <span style={{ fontSize:'11px', color:muted, textDecoration:'line-through' }}>
+                                                    {displayINRCurrency(product?.price)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <button className="vcp-add-btn" onClick={(e) => handleAddToCart(e, product?._id)}>
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </Link>
+                            )
+                        })
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

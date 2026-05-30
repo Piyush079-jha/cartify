@@ -1,65 +1,73 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FaShoppingBag, FaHeart, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa'
+import { FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa'
 
 const Footer = ({ isDark }) => {
+  const bg     = isDark ? '#0e0e0e' : '#1a1814'
+  const text   = isDark ? '#a09890' : '#9a9088'
+  const light  = isDark ? '#e8e4dc' : '#e8e4dc'
+  const border = 'rgba(232,228,220,0.1)'
+  const gold   = '#c9a84c'
+
   const socialLinks = [
     { Icon: FaInstagram, url: 'https://www.instagram.com/piyush_jha39/', label: 'Instagram' },
-    { Icon: FaLinkedin, url: 'https://www.linkedin.com/in/piyush-jha1134/', label: 'LinkedIn' },
-    { Icon: FaGithub, url: 'https://github.com/', label: 'GitHub' },
+    { Icon: FaLinkedin,  url: 'https://www.linkedin.com/in/piyush-jha1134/', label: 'LinkedIn' },
+    { Icon: FaGithub,    url: 'https://github.com/', label: 'GitHub' },
   ]
   const quickLinks = [
-    { label: 'Home', path: '/' }, { label: 'All Products', path: '/product-category' },
-    { label: 'Cart', path: '/cart' }, { label: 'Login', path: '/login' },
+    { label: 'Home', path: '/' },
+    { label: 'All Products', path: '/product-category' },
+    { label: 'Cart', path: '/cart' },
+    { label: 'Sign In', path: '/login' },
   ]
   const categoryLinks = [
-    { label: 'Airpods', value: 'airpodes' }, { label: 'Mobiles', value: 'mobiles' },
-    { label: 'Earphones', value: 'earphones' }, { label: 'Camera', value: 'camera' },
-    { label: 'Speakers', value: 'speakers' }, { label: 'Refrigerator', value: 'refrigerator' },
+    { label: 'Mobiles', value: 'mobiles' },
+    { label: 'Audio', value: 'earphones' },
+    { label: 'Cameras', value: 'camera' },
+    { label: 'Speakers', value: 'speakers' },
+    { label: 'Watches', value: 'watches' },
+    { label: 'Refrigerators', value: 'refrigerator' },
   ]
-  const linkStyle = { color: 'rgba(255,255,255,0.75)', textDecoration: 'none', fontSize: '13px', display: 'inline-block', transition: 'all 0.2s ease', padding: '2px 0' }
+
+  const linkStyle = {
+    color: text, textDecoration: 'none', fontSize: '12px',
+    display: 'inline-block', transition: 'color 0.2s ease',
+    letterSpacing: '0.04em', lineHeight: 1
+  }
 
   return (
     <>
       <style>{`
-        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
-        @media (max-width: 900px) { .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; } }
+        .ftr-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 48px; }
+        .ftr-link:hover { color: ${light} !important; }
+        @media (max-width: 900px) { .ftr-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
         @media (max-width: 540px) {
-          .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
-          .footer-brand { grid-column: 1 / -1; }
-          .footer-inner { padding: 32px 16px 24px !important; }
-          .footer-bottom { padding: 14px 16px !important; }
-        }
-        @media (max-width: 380px) {
-          .footer-grid { grid-template-columns: 1fr; }
-          .footer-brand { grid-column: auto; }
+          .ftr-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+          .ftr-brand { grid-column: 1 / -1; }
+          .ftr-inner { padding: 40px 20px 32px !important; }
+          .ftr-bottom { padding: 16px 20px !important; }
         }
       `}</style>
 
-      <footer style={{ background: isDark ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', marginTop: 'auto' }}>
-        <div className="footer-inner" style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 24px 32px' }}>
-          <div className="footer-grid">
+      <footer style={{ background: bg, color: text }}>
+        <div className="ftr-inner" style={{ maxWidth: '1400px', margin: '0 auto', padding: '64px 32px 48px' }}>
+          <div className="ftr-grid">
 
             {/* Brand */}
-            <div className="footer-brand">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                <div style={{ width: '38px', height: '38px', background: 'rgba(255,255,255,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                  <FaShoppingBag />
-                </div>
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '1px' }}>Cartify</div>
-                  <div style={{ fontSize: '10px', opacity: 0.7, letterSpacing: '3px', textTransform: 'uppercase' }}>shop here</div>
-                </div>
+            <div className="ftr-brand">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '20px', fontWeight: 300, letterSpacing: '0.25em', textTransform: 'uppercase', color: light }}>Cartify</div>
+                <div style={{ width: '24px', height: '0.5px', background: gold, marginTop: '8px' }} />
               </div>
-              <p style={{ fontSize: '13px', opacity: 0.75, lineHeight: 1.7, maxWidth: '220px', margin: '0 0 16px' }}>
-                Your one-stop destination for the best electronics, gadgets, and more at unbeatable prices.
+              <p style={{ fontSize: '12px', lineHeight: 1.9, maxWidth: '220px', margin: '0 0 24px', letterSpacing: '0.03em' }}>
+                Curated electronics and lifestyle products. Thoughtfully selected, beautifully delivered.
               </p>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
                 {socialLinks.map(({ Icon, url, label }) => (
                   <a key={label} href={url} target="_blank" rel="noopener noreferrer" title={label}
-                    style={{ width: '34px', height: '34px', background: 'rgba(255,255,255,0.15)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#fff', textDecoration: 'none', transition: 'all 0.3s ease' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.3)'; e.currentTarget.style.transform = 'translateY(-3px)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(0)' }}
+                    style={{ width: '32px', height: '32px', border: `0.5px solid ${border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', color: text, textDecoration: 'none', transition: 'all 0.2s ease', borderRadius: '1px' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = gold; e.currentTarget.style.color = gold }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.color = text }}
                   ><Icon /></a>
                 ))}
               </div>
@@ -67,52 +75,51 @@ const Footer = ({ isDark }) => {
 
             {/* Quick Links */}
             <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', opacity: 0.9 }}>Quick Links</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+              <h4 style={{ fontSize: '10px', fontWeight: 500, marginBottom: '20px', letterSpacing: '0.14em', textTransform: 'uppercase', color: light }}>Navigation</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {quickLinks.map(item => (
-                  <Link key={item.path} to={item.path} style={linkStyle}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'translateX(4px)' }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >→ {item.label}</Link>
+                  <Link key={item.path} to={item.path} style={linkStyle} className="ftr-link">{item.label}</Link>
                 ))}
               </div>
             </div>
 
             {/* Categories */}
             <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', opacity: 0.9 }}>Categories</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+              <h4 style={{ fontSize: '10px', fontWeight: 500, marginBottom: '20px', letterSpacing: '0.14em', textTransform: 'uppercase', color: light }}>Categories</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {categoryLinks.map(cat => (
-                  <Link key={cat.value} to={`/product-category?category=${cat.value}`} style={linkStyle}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'translateX(4px)' }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >→ {cat.label}</Link>
+                  <Link key={cat.value} to={`/product-category?category=${cat.value}`} style={linkStyle} className="ftr-link">{cat.label}</Link>
                 ))}
               </div>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', opacity: 0.9 }}>Contact</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', fontSize: '13px', opacity: 0.75 }}>
-                <a href="mailto:piyushjha1134@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>📧 piyushjha1134@gmail.com</a>
-                <a href="tel:+919631163498" style={{ color: 'inherit', textDecoration: 'none' }}>📞 +91 9631163498</a>
-                <p style={{ margin: 0 }}>📍 India</p>
+              <h4 style={{ fontSize: '10px', fontWeight: 500, marginBottom: '20px', letterSpacing: '0.14em', textTransform: 'uppercase', color: light }}>Contact</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <a href="mailto:piyushjha1134@gmail.com" style={{ ...linkStyle, lineHeight: 1.5 }} className="ftr-link">piyushjha1134@gmail.com</a>
+                <a href="tel:+919631163498" style={linkStyle} className="ftr-link">+91 96311 63498</a>
+                <span style={{ fontSize: '12px', letterSpacing: '0.04em' }}>India</span>
               </div>
-              <div style={{ marginTop: '16px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', fontSize: '12px', opacity: 0.85, lineHeight: 2 }}>
-                🛡️ 100% Secure Payments<br />
-                🚚 Fast Delivery Across India<br />
-                🔄 Easy Returns & Refunds
+              <div style={{ marginTop: '24px', borderTop: `0.5px solid ${border}`, paddingTop: '20px' }}>
+                {['Secure Payments', 'Fast Delivery', 'Easy Returns'].map(item => (
+                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    <div style={{ width: '3px', height: '3px', background: gold, borderRadius: '50%', flexShrink: 0 }} />
+                    <span style={{ fontSize: '11px', letterSpacing: '0.04em' }}>{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="footer-bottom" style={{ borderTop: '1px solid rgba(255,255,255,0.15)', padding: '14px 24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '13px', opacity: 0.75, margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            © {new Date().getFullYear()}
-            <strong style={{ color: '#fff' }}>Piyush Shop</strong>
-            — Crafted with <FaHeart style={{ color: '#f5576c', fontSize: '12px' }} /> in India. All rights reserved.
+        {/* Bottom bar */}
+        <div className="ftr-bottom" style={{ borderTop: `0.5px solid ${border}`, padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <p style={{ fontSize: '11px', margin: 0, letterSpacing: '0.04em' }}>
+            © {new Date().getFullYear()} Cartify. All rights reserved.
+          </p>
+          <p style={{ fontSize: '11px', margin: 0, letterSpacing: '0.04em' }}>
+            Crafted in India
           </p>
         </div>
       </footer>

@@ -9,50 +9,80 @@ const Home = () => {
   const { isDark } = useOutletContext()
   const [isVisible, setIsVisible] = useState(false)
 
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
+  useEffect(() => { setIsVisible(true) }, [])
+
+  const bg     = isDark ? '#0e0e0e' : '#faf9f7'
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.08)'
+  const muted  = isDark ? '#555' : '#ccc'
 
   return (
     <>
       <style>{`
-        @media (max-width: 768px) {
-          .home-wrapper {
-            padding-top: 64px !important;
-          }
+        @media (max-width: 768px) { .home-wrapper { padding-top: 60px !important; } }
+        @media (max-width: 480px) { .home-wrapper { padding-top: 60px !important; } }
+
+        .home-section-label {
+          font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+          color: ${isDark ? '#666' : '#aaa'}; margin: 0 0 4px;
         }
-        @media (max-width: 480px) {
-          .home-wrapper {
-            padding-top: 60px !important;
-          }
+        .home-section-title {
+          font-size: 22px; font-weight: 300; letter-spacing: '-0.01em';
+          color: ${isDark ? '#e8e4dc' : '#1a1814'};
+          font-family: Georgia, "Times New Roman", serif; margin: 0;
         }
       `}</style>
+
       <div
         className="home-wrapper"
         style={{
           opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'opacity 0.6s ease, transform 0.6s ease',
-          paddingTop: '68px',
-          minHeight: '100vh',
-          background: isDark
-            ? 'linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%)'
-            : 'linear-gradient(180deg, #ffffff 0%, #f9f9fb 100%)'
-        }}>
+          transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+          paddingTop: '60px', minHeight: '100vh', background: bg
+        }}
+      >
+        {/* Category strip */}
         <CategoryList isDark={isDark} />
+
+        {/* Hero banner */}
         <BannerProduct isDark={isDark} />
 
-        <HorizontalCardProduct isDark={isDark} category={"airpodes"} heading={"Top's Airpodes"} />
-        <HorizontalCardProduct isDark={isDark} category={"watches"} heading={"Popular's Watches"} />
+        {/* Divider */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px' }}>
+          <div style={{ height: '0.5px', background: border }} />
+        </div>
 
-        <VerticalCardProduct isDark={isDark} category={"mobiles"} heading={"Mobiles"} />
-        <VerticalCardProduct isDark={isDark} category={"mouse"} heading={"Mouse"} />
+        {/* Horizontal featured sections */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 0' }}>
+          <p className="home-section-label">Featured</p>
+          <h2 className="home-section-title">Staff Picks</h2>
+        </div>
+
+        <HorizontalCardProduct isDark={isDark} category={"airpodes"} heading={"Airpods"} />
+        <HorizontalCardProduct isDark={isDark} category={"watches"} heading={"Watches"} />
+
+        {/* Divider */}
+        <div style={{ maxWidth: '1400px', margin: '32px auto 0', padding: '0 32px' }}>
+          <div style={{ height: '0.5px', background: border }} />
+        </div>
+
+        {/* Vertical product grid sections */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 32px 0' }}>
+          <p className="home-section-label">Browse All</p>
+          <h2 className="home-section-title">Our Collection</h2>
+        </div>
+
+        <VerticalCardProduct isDark={isDark} category={"mobiles"}     heading={"Mobiles"} />
+        <VerticalCardProduct isDark={isDark} category={"mouse"}       heading={"Mouse"} />
         <VerticalCardProduct isDark={isDark} category={"televisions"} heading={"Televisions"} />
-        <VerticalCardProduct isDark={isDark} category={"camera"} heading={"Camera & Photography"} />
-        <VerticalCardProduct isDark={isDark} category={"earphones"} heading={"Wired Earphones"} />
-        <VerticalCardProduct isDark={isDark} category={"speakers"} heading={"Bluetooth Speakers"} />
-        <VerticalCardProduct isDark={isDark} category={"refrigerator"} heading={"Refrigerator"} />
-        <VerticalCardProduct isDark={isDark} category={"trimmers"} heading={"Trimmers"} />
+        <VerticalCardProduct isDark={isDark} category={"camera"}      heading={"Cameras"} />
+        <VerticalCardProduct isDark={isDark} category={"earphones"}   heading={"Earphones"} />
+        <VerticalCardProduct isDark={isDark} category={"speakers"}    heading={"Speakers"} />
+        <VerticalCardProduct isDark={isDark} category={"refrigerator"} heading={"Refrigerators"} />
+        <VerticalCardProduct isDark={isDark} category={"trimmers"}    heading={"Trimmers"} />
+
+        {/* Footer breathing room */}
+        <div style={{ height: '64px' }} />
       </div>
     </>
   )

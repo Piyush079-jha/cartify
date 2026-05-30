@@ -17,7 +17,6 @@ const Header = ({ isDark, toggleDarkMode }) => {
   const dispatch = useDispatch()
   const [menuDisplay, setMenuDisplay] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchFocused, setSearchFocused] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const context = useContext(Context)
   const navigate = useNavigate()
@@ -25,6 +24,14 @@ const Header = ({ isDark, toggleDarkMode }) => {
   const URLSearch = new URLSearchParams(searchInput?.search)
   const searchQuery = URLSearch.getAll("q")
   const [search, setSearch] = useState(searchQuery)
+
+  // Palette
+  const bg      = isDark ? '#0e0e0e' : '#faf9f7'
+  const text     = isDark ? '#e8e4dc' : '#1a1814'
+  const muted    = isDark ? '#888' : '#999'
+  const border   = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,24,20,0.1)'
+  const surface  = isDark ? '#1c1c1c' : '#ffffff'
+  const gold     = '#c9a84c'
 
   const handleLogout = async () => {
     const fetchData = await fetch(SummaryApi.logout_user.url, {
@@ -37,272 +44,199 @@ const Header = ({ isDark, toggleDarkMode }) => {
       dispatch(setUserDetails(null))
       navigate("/")
     }
-    if (data.error) {
-      toast.error(data.message)
-    }
+    if (data.error) toast.error(data.message)
   }
 
   const handleSearch = (e) => {
     const { value } = e.target
     setSearch(value)
-    if (value) {
-      navigate(`/search?q=${value}`)
-    } else {
-      navigate("/search")
-    }
+    if (value) navigate(`/search?q=${value}`)
+    else navigate("/search")
   }
 
-  const closeMenu = () => {
-    setMenuDisplay(false)
-    setMobileMenuOpen(false)
-  }
+  const closeMenu = () => { setMenuDisplay(false); setMobileMenuOpen(false) }
 
   const menuItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '11px 16px',
-    borderRadius: '10px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: isDark ? '#e0e0e0' : '#333',
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-    transition: 'all 0.2s ease',
-    cursor: 'pointer',
-    border: 'none',
-    background: 'transparent',
-    width: '100%',
-    textAlign: 'left'
+    display: 'flex', alignItems: 'center', gap: '10px',
+    padding: '10px 14px', fontSize: '13px', fontWeight: 400,
+    color: text, textDecoration: 'none', whiteSpace: 'nowrap',
+    transition: 'all 0.2s ease', cursor: 'pointer',
+    border: 'none', background: 'transparent',
+    width: '100%', textAlign: 'left', letterSpacing: '0.02em'
   }
-
-  const bg = isDark ? '#1a1a1a' : '#ffffff'
-  const border = isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.06)'
 
   return (
     <>
       <style>{`
         @keyframes dropdownSlide {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes mobileSlide {
-          from { opacity: 0; transform: translateY(-100%); }
-          to { opacity: 1; transform: translateY(0); }
+        .hdr-nav-link {
+          font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: ${muted}; text-decoration: none; font-weight: 400;
+          transition: color 0.2s ease; padding: 4px 0;
+          border-bottom: 1px solid transparent;
         }
-        .header-search-desktop { display: flex; }
-        .header-search-mobile { display: none; }
-        .header-mobile-btn { display: none; }
-        .header-right-desktop { display: flex; }
-
+        .hdr-nav-link:hover { color: ${text}; border-bottom-color: ${gold}; }
+        .hdr-search-input::placeholder { color: ${muted}; }
+        .hdr-icon-btn { transition: color 0.2s ease; }
+        .hdr-icon-btn:hover { color: ${gold} !important; }
+        .hdr-menu-item:hover { background: ${isDark ? 'rgba(201,168,76,0.08)' : 'rgba(201,168,76,0.06)'} !important; color: ${gold} !important; }
+        .hdr-mobile-btn { display: none !important; }
+        .hdr-search-desktop { display: flex !important; }
+        @media (max-width: 900px) {
+          .hdr-nav-links { display: none !important; }
+        }
         @media (max-width: 768px) {
-          .header-search-desktop { display: none !important; }
-          .header-mobile-btn { display: flex !important; }
-          .header-right-desktop { gap: 12px !important; }
-          .header-login-btn { padding: 8px 14px !important; font-size: 13px !important; }
-        }
-
-        @media (max-width: 480px) {
-          .header-inner { padding: 0 14px !important; gap: 12px !important; }
+          .hdr-search-desktop { display: none !important; }
+          .hdr-mobile-btn { display: flex !important; }
         }
       `}</style>
 
       <header style={{
-        height: '64px',
-        background: bg,
-        borderBottom: border,
-        position: 'fixed',
-        width: '100%',
-        top: 0,
-        zIndex: 50,
-        boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.08)',
+        height: '60px', background: bg,
+        borderBottom: `0.5px solid ${border}`,
+        position: 'fixed', width: '100%', top: 0, zIndex: 50,
         transition: 'all 0.3s ease'
       }}>
-        <div className="header-inner" style={{
-          height: '100%',
-          maxWidth: '1280px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 24px',
-          justifyContent: 'space-between',
-          gap: '24px'
+        <div style={{
+          height: '100%', maxWidth: '1400px', margin: '0 auto',
+          display: 'flex', alignItems: 'center',
+          padding: '0 32px', justifyContent: 'space-between', gap: '24px'
         }}>
 
           {/* Logo */}
           <div style={{ flexShrink: 0 }}>
             <Link to={"/"}>
-              <Logo w={80} h={44} isDark={isDark} />
+              <Logo w={72} h={40} isDark={isDark} />
             </Link>
           </div>
 
-          {/* Search Bar — Desktop */}
-          <div className="header-search-desktop" style={{ flex: 1, maxWidth: '560px' }}>
+          {/* Nav links — desktop */}
+          <nav className="hdr-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+            {['All Products', 'Mobiles', 'Cameras', 'Audio', 'Watches'].map(label => (
+              <Link key={label}
+                to={label === 'All Products' ? '/product-category' : `/product-category?category=${label.toLowerCase()}`}
+                className="hdr-nav-link">{label}</Link>
+            ))}
+          </nav>
+
+          {/* Search — desktop */}
+          <div className="hdr-search-desktop" style={{ flex: 1, maxWidth: '380px' }}>
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              background: searchFocused
-                ? (isDark ? 'rgba(102,126,234,0.2)' : 'rgba(102,126,234,0.08)')
-                : (isDark ? 'rgba(255,255,255,0.1)' : '#f7f7f7'),
-              borderRadius: '14px',
-              border: searchFocused ? '2px solid #667eea' : '2px solid transparent',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              boxShadow: searchFocused ? '0 8px 24px rgba(102,126,234,0.15)' : 'none'
+              display: 'flex', alignItems: 'center', width: '100%',
+              background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(26,24,20,0.04)',
+              border: `0.5px solid ${border}`, borderRadius: '2px', overflow: 'hidden'
             }}>
               <input
+                className="hdr-search-input"
                 type='text'
-                placeholder='Search for products, brands and more...'
+                placeholder='Search products...'
                 style={{
-                  flex: 1,
-                  border: 'none',
-                  background: 'transparent',
-                  padding: '12px 18px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  color: isDark ? '#fff' : '#333',
-                  fontWeight: 500
+                  flex: 1, border: 'none', background: 'transparent',
+                  padding: '10px 14px', fontSize: '13px', outline: 'none',
+                  color: text, letterSpacing: '0.02em'
                 }}
-                onChange={handleSearch}
-                value={search}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
+                onChange={handleSearch} value={search}
               />
               <div style={{
-                width: '48px',
-                height: '48px',
-                background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: 'white',
-                fontSize: '17px',
-                flexShrink: 0
+                width: '40px', height: '40px', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: muted, fontSize: '14px', flexShrink: 0
               }}>
                 <GrSearch />
               </div>
             </div>
           </div>
 
-          {/* Right Side */}
-          <div className="header-right-desktop" style={{ display: 'flex', alignItems: 'center', gap: '18px', flexShrink: 0 }}>
+          {/* Right side */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
 
-            {/* Mobile Search Icon */}
-            <div className="header-mobile-btn" style={{ display: 'none', alignItems: 'center', cursor: 'pointer', color: '#667eea', fontSize: '20px' }}
-              onClick={() => setMobileSearchOpen(prev => !prev)}>
+            {/* Mobile search */}
+            <div className="hdr-mobile-btn" style={{ alignItems: 'center', cursor: 'pointer', color: muted, fontSize: '17px' }}
+              onClick={() => setMobileSearchOpen(p => !p)}>
               <GrSearch />
             </div>
 
-            {/* Dark Mode */}
             <DarkModeToggle isDark={isDark} toggleDarkMode={toggleDarkMode} />
 
-            {/* User Avatar */}
-            <div style={{ position: 'relative' }}>
-              {user?._id && (
-                <div
-                  style={{
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: isDark ? 'rgba(102,126,234,0.2)' : 'linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15))',
-                    fontSize: '22px',
-                    color: '#667eea',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onClick={() => setMenuDisplay(prev => !prev)}
-                >
-                  {user?.profilePic ? (
-                    <img src={user?.profilePic} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #667eea' }} alt={user?.name} />
-                  ) : (
-                    <FaRegCircleUser />
-                  )}
-                </div>
-              )}
-
-              {/* Dropdown */}
-              {menuDisplay && user?._id && (
-                <div style={{
-                  position: 'absolute',
-                  top: '52px',
-                  right: 0,
-                  background: isDark ? '#2d2d2d' : '#ffffff',
-                  borderRadius: '16px',
-                  boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.6)' : '0 12px 40px rgba(0,0,0,0.15)',
-                  padding: '8px',
-                  minWidth: '210px',
-                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.06)',
-                  zIndex: 100,
-                  animation: 'dropdownSlide 0.3s ease'
-                }}>
-                  <div style={{ padding: '12px 16px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #f0f0f0', marginBottom: '6px' }}>
-                    <p style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#fff' : '#111', margin: 0, textTransform: 'capitalize' }}>{user?.name || 'User'}</p>
-                    <p style={{ fontSize: '12px', color: '#667eea', margin: '2px 0 0 0', fontWeight: 500 }}>
-                      {user?.role === ROLE.ADMIN ? '👑 Administrator' : '👤 Customer'}
-                    </p>
-                  </div>
-
-                  {user?.role === ROLE.ADMIN && (
-                    <>
-                      {[
-                        { to: '/admin-panel/all-products', icon: <FaTachometerAlt style={{ color: '#667eea' }}/>, label: 'Dashboard' },
-                        { to: '/admin-panel/all-products', icon: <FaBox style={{ color: '#667eea' }}/>, label: 'All Products' },
-                        { to: '/admin-panel/all-users', icon: <FaUsers style={{ color: '#667eea' }}/>, label: 'All Users' },
-                      ].map(item => (
-                        <Link key={item.label} to={item.to} style={menuItemStyle} onClick={closeMenu}
-                          onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(102,126,234,0.2)' : 'rgba(102,126,234,0.08)'; e.currentTarget.style.color = '#667eea' }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = isDark ? '#e0e0e0' : '#333' }}>
-                          {item.icon} {item.label}
-                        </Link>
-                      ))}
-                    </>
-                  )}
-
-                  {user?.role !== ROLE.ADMIN && (
-                    <>
-                      {[
-                        { to: '/cart', icon: <FaShoppingCart style={{ color: '#667eea' }}/>, label: 'My Cart' },
-                        { to: '/wishlist', icon: <FaHeart style={{ color: '#f5576c' }}/>, label: 'My Wishlist' },
-                        { to: '/my-orders', icon: <FaClipboardList style={{ color: '#667eea' }}/>, label: 'My Orders' },
-                      ].map(item => (
-                        <Link key={item.label} to={item.to} style={menuItemStyle} onClick={closeMenu}
-                          onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(102,126,234,0.2)' : 'rgba(102,126,234,0.08)'; e.currentTarget.style.color = '#667eea' }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = isDark ? '#e0e0e0' : '#333' }}>
-                          {item.icon} {item.label}
-                        </Link>
-                      ))}
-                    </>
-                  )}
-
-                  <div style={{ borderTop: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #f0f0f0', margin: '6px 0' }} />
-                  <button onClick={() => { handleLogout(); closeMenu() }}
-                    style={{ ...menuItemStyle, color: '#f5576c', width: '100%' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(245,87,108,0.1)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
-                    <FaSignOutAlt style={{ color: '#f5576c' }} /> Logout
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Cart Icon */}
+            {/* User */}
             {user?._id && (
-              <Link to={"/cart"} style={{ position: 'relative', fontSize: '24px', color: '#667eea', display: 'flex', alignItems: 'center', transition: 'all 0.3s ease' }}>
+              <div style={{ position: 'relative' }}>
+                <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '50%', border: `0.5px solid ${border}`, color: muted, fontSize: '18px', transition: 'all 0.2s ease' }}
+                  onClick={() => setMenuDisplay(p => !p)}>
+                  {user?.profilePic
+                    ? <img src={user?.profilePic} style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover' }} alt={user?.name} />
+                    : <FaRegCircleUser />}
+                </div>
+
+                {menuDisplay && (
+                  <div style={{
+                    position: 'absolute', top: '46px', right: 0,
+                    background: surface,
+                    border: `0.5px solid ${border}`,
+                    borderRadius: '2px',
+                    boxShadow: isDark ? '0 16px 48px rgba(0,0,0,0.5)' : '0 16px 48px rgba(0,0,0,0.08)',
+                    padding: '6px', minWidth: '200px', zIndex: 100,
+                    animation: 'dropdownSlide 0.2s ease'
+                  }}>
+                    <div style={{ padding: '12px 14px', borderBottom: `0.5px solid ${border}`, marginBottom: '4px' }}>
+                      <p style={{ fontSize: '13px', fontWeight: 500, color: text, margin: 0, textTransform: 'capitalize', letterSpacing: '0.02em' }}>{user?.name || 'User'}</p>
+                      <p style={{ fontSize: '11px', color: gold, margin: '2px 0 0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                        {user?.role === ROLE.ADMIN ? 'Administrator' : 'Member'}
+                      </p>
+                    </div>
+
+                    {user?.role === ROLE.ADMIN && (
+                      <>
+                        {[
+                          { to: '/admin-panel/all-products', icon: <FaTachometerAlt />, label: 'Dashboard' },
+                          { to: '/admin-panel/all-products', icon: <FaBox />, label: 'All Products' },
+                          { to: '/admin-panel/all-users', icon: <FaUsers />, label: 'All Users' },
+                        ].map(item => (
+                          <Link key={item.label} to={item.to} style={menuItemStyle} className="hdr-menu-item" onClick={closeMenu}>
+                            <span style={{ fontSize: '13px', color: muted }}>{item.icon}</span> {item.label}
+                          </Link>
+                        ))}
+                      </>
+                    )}
+
+                    {user?.role !== ROLE.ADMIN && (
+                      <>
+                        {[
+                          { to: '/cart', icon: <FaShoppingCart />, label: 'My Cart' },
+                          { to: '/wishlist', icon: <FaHeart />, label: 'Wishlist' },
+                          { to: '/my-orders', icon: <FaClipboardList />, label: 'Orders' },
+                        ].map(item => (
+                          <Link key={item.label} to={item.to} style={menuItemStyle} className="hdr-menu-item" onClick={closeMenu}>
+                            <span style={{ fontSize: '13px', color: muted }}>{item.icon}</span> {item.label}
+                          </Link>
+                        ))}
+                      </>
+                    )}
+
+                    <div style={{ borderTop: `0.5px solid ${border}`, margin: '4px 0' }} />
+                    <button onClick={() => { handleLogout(); closeMenu() }}
+                      style={{ ...menuItemStyle, color: '#b04040' }} className="hdr-menu-item">
+                      <FaSignOutAlt /> Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Cart */}
+            {user?._id && (
+              <Link to={"/cart"} style={{ position: 'relative', fontSize: '18px', color: muted, display: 'flex', alignItems: 'center' }} className="hdr-icon-btn">
                 <FaShoppingCart />
                 {context?.cartProductCount > 0 && (
                   <div style={{
-                    position: 'absolute', top: '-9px', right: '-11px',
-                    background: 'linear-gradient(135deg, #f093fb, #f5576c)',
-                    color: 'white', minWidth: '20px', height: '20px',
-                    borderRadius: '10px', fontSize: '10px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, padding: '0 5px',
-                    boxShadow: '0 4px 12px rgba(245,87,108,0.4)'
+                    position: 'absolute', top: '-7px', right: '-9px',
+                    background: gold, color: '#fff',
+                    minWidth: '17px', height: '17px', borderRadius: '10px',
+                    fontSize: '9px', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontWeight: 600, padding: '0 4px', letterSpacing: 0
                   }}>
                     {context?.cartProductCount}
                   </div>
@@ -310,46 +244,40 @@ const Header = ({ isDark, toggleDarkMode }) => {
               </Link>
             )}
 
-            {/* Login Button */}
+            {/* Login */}
             {!user?._id && (
-              <Link to={"/login"} className="header-login-btn"
-                style={{
-                  padding: '9px 20px', borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                  color: '#fff', fontWeight: 600, fontSize: '14px',
-                  textDecoration: 'none', transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(102,126,234,0.3)'
-                }}>
-                Login
-              </Link>
+              <Link to={"/login"} style={{
+                padding: '7px 18px', border: `0.5px solid ${border}`,
+                color: text, fontWeight: 400, fontSize: '12px',
+                letterSpacing: '0.1em', textTransform: 'uppercase',
+                textDecoration: 'none', transition: 'all 0.2s ease',
+                background: 'transparent', borderRadius: '2px'
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = gold; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = gold }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = text; e.currentTarget.style.borderColor = border }}
+              >Sign In</Link>
             )}
 
-            {/* Hamburger — Mobile */}
-            <div className="header-mobile-btn" style={{ display: 'none', alignItems: 'center', cursor: 'pointer', color: '#667eea', fontSize: '22px' }}
-              onClick={() => setMobileMenuOpen(prev => !prev)}>
+            {/* Hamburger */}
+            <div className="hdr-mobile-btn" style={{ alignItems: 'center', cursor: 'pointer', color: muted, fontSize: '18px' }}
+              onClick={() => setMobileMenuOpen(p => !p)}>
               {mobileMenuOpen ? <FaTimes /> : <FaBars />}
             </div>
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Mobile Search */}
         {mobileSearchOpen && (
           <div style={{
-            position: 'absolute', top: '64px', left: 0, right: 0,
-            background: bg, borderBottom: border,
-            padding: '10px 16px', zIndex: 49,
-            animation: 'dropdownSlide 0.2s ease'
+            position: 'absolute', top: '60px', left: 0, right: 0,
+            background: bg, borderBottom: `0.5px solid ${border}`,
+            padding: '10px 16px', zIndex: 49, animation: 'dropdownSlide 0.2s ease'
           }}>
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              background: isDark ? 'rgba(255,255,255,0.1)' : '#f7f7f7',
-              borderRadius: '12px', border: '2px solid #667eea', overflow: 'hidden'
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(26,24,20,0.04)', border: `0.5px solid ${border}`, borderRadius: '2px', overflow: 'hidden' }}>
               <input type='text' placeholder='Search products...'
-                style={{ flex: 1, border: 'none', background: 'transparent', padding: '11px 16px', fontSize: '14px', outline: 'none', color: isDark ? '#fff' : '#333' }}
-                onChange={handleSearch} value={search} autoFocus
-              />
-              <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white', fontSize: '16px', flexShrink: 0 }}>
+                style={{ flex: 1, border: 'none', background: 'transparent', padding: '10px 14px', fontSize: '13px', outline: 'none', color: text }}
+                onChange={handleSearch} value={search} autoFocus />
+              <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: muted, fontSize: '14px' }}>
                 <GrSearch />
               </div>
             </div>
@@ -359,34 +287,30 @@ const Header = ({ isDark, toggleDarkMode }) => {
         {/* Mobile Menu */}
         {mobileMenuOpen && user?._id && (
           <div style={{
-            position: 'absolute', top: '64px', left: 0, right: 0,
-            background: isDark ? '#2d2d2d' : '#fff',
-            borderBottom: border, padding: '12px 16px',
-            zIndex: 49, animation: 'dropdownSlide 0.25s ease',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+            position: 'absolute', top: '60px', left: 0, right: 0,
+            background: surface, borderBottom: `0.5px solid ${border}`,
+            padding: '8px', zIndex: 49, animation: 'dropdownSlide 0.2s ease'
           }}>
-            <div style={{ padding: '10px 14px 14px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #f0f0f0', marginBottom: '8px' }}>
-              <p style={{ fontWeight: 700, color: isDark ? '#fff' : '#111', margin: 0, textTransform: 'capitalize' }}>{user?.name}</p>
-              <p style={{ fontSize: '12px', color: '#667eea', margin: '2px 0 0', fontWeight: 500 }}>{user?.role === ROLE.ADMIN ? '👑 Administrator' : '👤 Customer'}</p>
+            <div style={{ padding: '10px 14px 12px', borderBottom: `0.5px solid ${border}`, marginBottom: '4px' }}>
+              <p style={{ fontWeight: 500, color: text, margin: 0, textTransform: 'capitalize', fontSize: '13px' }}>{user?.name}</p>
+              <p style={{ fontSize: '11px', color: gold, margin: '2px 0 0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{user?.role === ROLE.ADMIN ? 'Administrator' : 'Member'}</p>
             </div>
-
             {user?.role === ROLE.ADMIN ? (
               <>
-                <Link to="/admin-panel/all-products" style={menuItemStyle} onClick={closeMenu}><FaTachometerAlt style={{ color: '#667eea' }}/> Dashboard</Link>
-                <Link to="/admin-panel/all-products" style={menuItemStyle} onClick={closeMenu}><FaBox style={{ color: '#667eea' }}/> All Products</Link>
-                <Link to="/admin-panel/all-users" style={menuItemStyle} onClick={closeMenu}><FaUsers style={{ color: '#667eea' }}/> All Users</Link>
+                <Link to="/admin-panel/all-products" style={menuItemStyle} onClick={closeMenu}><FaTachometerAlt /> Dashboard</Link>
+                <Link to="/admin-panel/all-products" style={menuItemStyle} onClick={closeMenu}><FaBox /> All Products</Link>
+                <Link to="/admin-panel/all-users" style={menuItemStyle} onClick={closeMenu}><FaUsers /> All Users</Link>
               </>
             ) : (
               <>
-                <Link to="/cart" style={menuItemStyle} onClick={closeMenu}><FaShoppingCart style={{ color: '#667eea' }}/> My Cart</Link>
-                <Link to="/wishlist" style={menuItemStyle} onClick={closeMenu}><FaHeart style={{ color: '#f5576c' }}/> My Wishlist</Link>
-                <Link to="/my-orders" style={menuItemStyle} onClick={closeMenu}><FaClipboardList style={{ color: '#667eea' }}/> My Orders</Link>
+                <Link to="/cart" style={menuItemStyle} onClick={closeMenu}><FaShoppingCart /> My Cart</Link>
+                <Link to="/wishlist" style={menuItemStyle} onClick={closeMenu}><FaHeart /> Wishlist</Link>
+                <Link to="/my-orders" style={menuItemStyle} onClick={closeMenu}><FaClipboardList /> Orders</Link>
               </>
             )}
-
-            <div style={{ borderTop: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #f0f0f0', margin: '8px 0' }}/>
-            <button onClick={() => { handleLogout(); closeMenu() }} style={{ ...menuItemStyle, color: '#f5576c', width: '100%' }}>
-              <FaSignOutAlt style={{ color: '#f5576c' }}/> Logout
+            <div style={{ borderTop: `0.5px solid ${border}`, margin: '4px 0' }} />
+            <button onClick={() => { handleLogout(); closeMenu() }} style={{ ...menuItemStyle, color: '#b04040', width: '100%' }}>
+              <FaSignOutAlt /> Sign out
             </button>
           </div>
         )}
