@@ -44,29 +44,41 @@ const parseMessage = (text) => {
 }
 
 const MessageContent = ({ text, onNavigate }) => {
-  const gold = '#c9a84c'
   const parts = parseMessage(text)
   return (
-    <span style={{ lineHeight: 1.6 }}>
-      {parts.map((p, i) => p.type === 'text'
-        ? <span key={i}>{p.content}</span>
-        : (
-          <button key={i} onClick={() => onNavigate(p.url)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            margin: '2px 3px', padding: '3px 10px',
-            background: 'transparent',
-            color: gold, fontSize: 12, fontWeight: 500,
-            border: `0.5px solid rgba(201,168,76,0.4)`,
-            cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'all 0.2s', verticalAlign: 'middle',
-            borderRadius: '1px', letterSpacing: '0.04em'
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = gold; e.currentTarget.style.color = '#0a0a0a' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = gold }}
-          >
-            ↗ {p.label}
-          </button>
-        )
+    <span style={{ lineHeight: 1.65 }}>
+      {parts.map((p, i) =>
+        p.type === 'text'
+          ? <span key={i}>{p.content}</span>
+          : (
+            <button
+              key={i}
+              onClick={() => onNavigate(p.url)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                margin: '3px 3px', padding: '4px 11px',
+                background: 'rgba(201,168,76,0.1)',
+                color: '#c9a84c',
+                fontSize: 12, fontWeight: 500,
+                border: '0.5px solid rgba(201,168,76,0.35)',
+                borderRadius: '20px',
+                cursor: 'pointer', fontFamily: 'inherit',
+                transition: 'all 0.18s ease',
+                verticalAlign: 'middle',
+                letterSpacing: '0.02em'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#c9a84c'
+                e.currentTarget.style.color = '#1a1200'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(201,168,76,0.1)'
+                e.currentTarget.style.color = '#c9a84c'
+              }}
+            >
+              ↗ {p.label}
+            </button>
+          )
       )}
     </span>
   )
@@ -78,7 +90,7 @@ const ChatWidget = () => {
   const [isOpen, setIsOpen]     = useState(false)
   const [messages, setMessages] = useState([{
     role: 'model',
-    text: "Hello. I'm Cartify's assistant — ask me about products, orders, returns, or anything else.",
+    text: "Hello! I'm Cartify's assistant. Ask me about products, orders, returns, or anything else 👋",
     time: getTime()
   }])
   const [input, setInput]     = useState('')
@@ -89,23 +101,32 @@ const ChatWidget = () => {
   const { isDark, user } = useContext(Context)
   const navigate = useNavigate()
 
-  const gold       = '#c9a84c'
-  const goldBorder = 'rgba(201,168,76,0.35)'
-  const goldBg     = 'rgba(201,168,76,0.07)'
+  const gold      = '#c9a84c'
+  const goldLight = 'rgba(201,168,76,0.12)'
+  const goldBorder= 'rgba(201,168,76,0.35)'
 
-  const windowBg = isDark ? '#111110' : '#faf9f7'
-  const border   = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,20,0.09)'
-  const textMain = isDark ? '#e8e4dc' : '#1a1814'
-  const muted    = isDark ? 'rgba(160,152,144,0.7)' : 'rgba(130,125,118,0.8)'
-  const botBg    = isDark ? '#1a1a18' : '#f0ede8'
-  const inputBg  = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(26,24,20,0.03)'
+  /* ── Theme tokens ── */
+  const bg        = isDark ? '#111110'                   : '#ffffff'
+  const surface   = isDark ? '#1a1a18'                   : '#f5f4f1'
+  const border    = isDark ? 'rgba(255,255,255,0.08)'    : 'rgba(26,24,20,0.1)'
+  const textMain  = isDark ? '#e8e4dc'                   : '#1a1814'
+  const muted     = isDark ? 'rgba(160,152,144,0.75)'    : 'rgba(100,96,90,0.8)'
+  const userBubbleBg   = gold
+  const userBubbleText = '#1a1200'
+  const botBubbleBg    = isDark ? '#222220' : '#f0ede8'
+  const inputBorder    = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(26,24,20,0.15)'
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : '?'
-  const userHasName = !!user?.name
 
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
   useEffect(() => {
-    if (isOpen) { setTimeout(() => inputRef.current?.focus(), 100); setUnread(0) }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 120)
+      setUnread(0)
+    }
   }, [isOpen])
 
   const handleNavigate = (url) => { navigate(url); setIsOpen(false) }
@@ -139,7 +160,7 @@ const ChatWidget = () => {
     } catch {
       setMessages(prev => [...prev, {
         role: 'model',
-        text: "Something went wrong. Please try again.",
+        text: 'Something went wrong. Please try again.',
         time: getTime()
       }])
     }
@@ -152,296 +173,346 @@ const ChatWidget = () => {
 
   const clearChat = () => setMessages([{
     role: 'model',
-    text: "Hello. I'm Cartify's assistant — how can I help you today?",
+    text: "Hello! I'm Cartify's assistant. How can I help you today? 👋",
     time: getTime()
   }])
 
-  const suggestions = ["Best mobile under ₹20,000?", "Return policy?", "Top airpods?", "Free delivery?"]
+  const suggestions = ['Best mobile under ₹20,000?', 'Return policy?', 'Top airpods?', 'Free delivery?']
 
   return (
     <>
       <style>{`
         @keyframes cwSlide {
-          from { opacity: 0; transform: translateY(20px) scale(0.96); }
+          from { opacity: 0; transform: translateY(16px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0)   scale(1); }
         }
         @keyframes cwBounce {
-          0%, 60%, 100% { transform: translateY(0); }
-          30%           { transform: translateY(-5px); }
+          0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+          30%           { opacity: 1;    transform: translateY(-4px); }
         }
-        @keyframes cwPulse {
-          0%, 100% { box-shadow: 0 4px 16px rgba(201,168,76,0.25), 0 0 0 0 rgba(201,168,76,0.3); }
-          50%       { box-shadow: 0 4px 16px rgba(201,168,76,0.25), 0 0 0 6px rgba(201,168,76,0); }
+        @keyframes cwFabPulse {
+          0%, 100% { box-shadow: 0 4px 20px rgba(201,168,76,0.35), 0 0 0 0   rgba(201,168,76,0.25); }
+          50%       { box-shadow: 0 4px 20px rgba(201,168,76,0.35), 0 0 0 8px rgba(201,168,76,0); }
         }
+
+        /* ── FAB ── */
         .cw-fab {
           position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-          width: 52px; height: 52px;
-          border: 1px solid ${gold};
-          background: ${isDark ? '#111110' : '#ffffff'};
+          width: 56px; height: 56px; border-radius: 50%;
+          background: ${gold}; border: none;
           display: flex; align-items: center; justify-content: center;
           cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 1px;
-          box-shadow: 0 4px 16px rgba(201,168,76,0.25);
-          animation: cwPulse 2.5s ease-in-out infinite;
+          animation: cwFabPulse 2.8s ease-in-out infinite;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .cw-fab:hover {
-          border-color: ${gold};
-          background: ${goldBg};
-          transform: translateY(-2px);
+          transform: scale(1.06);
           animation: none;
-          box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+          box-shadow: 0 8px 28px rgba(201,168,76,0.5);
         }
-        .cw-textarea {
-          flex: 1; padding: 10px 13px;
-          border: 0.5px solid ${border};
-          background: ${inputBg};
-          color: ${textMain};
-          font-size: 13px; font-family: 'DM Sans', sans-serif;
-          resize: none; outline: none; line-height: 1.55;
-          max-height: 80px; overflow-y: auto; scrollbar-width: none;
-          transition: border-color 0.2s ease;
-          border-radius: 1px;
-          letter-spacing: 0.02em;
-        }
-        .cw-textarea::placeholder { color: ${muted}; }
-        .cw-textarea:focus { border-color: ${gold}; }
-        .cw-send-btn {
-          width: 38px; height: 38px;
-          border: 0.5px solid;
-          background: transparent;
+        .cw-fab svg { color: #1a1200; }
+
+        /* ── Unread badge ── */
+        .cw-badge {
+          position: absolute; top: -3px; right: -3px;
+          background: #e24b4a; color: #fff;
+          width: 20px; height: 20px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; font-size: 14px;
-          transition: all 0.22s ease;
-          flex-shrink: 0; border-radius: 1px;
+          font-size: 10px; font-weight: 700;
+          border: 2px solid ${isDark ? '#111110' : '#fff'};
+          font-family: 'DM Sans', sans-serif;
         }
-        .cw-chip {
-          padding: 5px 12px;
+
+        /* ── Chat window ── */
+        .cw-window {
+          position: fixed; bottom: 96px; right: 28px; z-index: 9998;
+          width: 375px; height: 560px;
+          background: ${bg};
+          border: 0.5px solid ${border};
+          border-radius: 20px;
+          box-shadow: ${isDark
+            ? '0 24px 64px rgba(0,0,0,0.65), 0 0 0 0.5px rgba(201,168,76,0.08)'
+            : '0 16px 48px rgba(0,0,0,0.13), 0 0 0 0.5px rgba(201,168,76,0.12)'};
+          display: flex; flex-direction: column;
+          overflow: hidden;
+          animation: cwSlide 0.22s ease;
+        }
+
+        /* ── Header ── */
+        .cw-header {
+          padding: 14px 16px;
+          background: ${isDark ? '#0e0e0d' : '#ffffff'};
+          border-bottom: 0.5px solid ${border};
+          display: flex; align-items: center; gap: 11px;
+          flex-shrink: 0;
+        }
+        .cw-header-avatar {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: ${goldLight};
+          border: 1.5px solid ${goldBorder};
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .cw-header-name {
+          font-size: 14px; font-weight: 500;
+          color: ${textMain}; margin: 0;
+          font-family: 'DM Sans', sans-serif; letter-spacing: 0.01em;
+        }
+        .cw-header-sub {
+          display: flex; align-items: center; gap: 5px; margin-top: 2px;
+        }
+        .cw-status-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #4caf7d;
+          box-shadow: 0 0 5px rgba(76,175,125,0.5);
+        }
+        .cw-status-text {
+          font-size: 11px; color: ${muted};
+          font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em;
+        }
+        .cw-clear-btn {
+          margin-left: auto;
           background: transparent;
           border: 0.5px solid ${border};
           color: ${muted};
-          font-size: 11px; font-weight: 400;
+          padding: 5px 12px; font-size: 11px;
+          letter-spacing: 0.08em; text-transform: uppercase;
           cursor: pointer; font-family: 'DM Sans', sans-serif;
+          border-radius: 20px;
           transition: all 0.18s ease;
-          border-radius: 1px; letter-spacing: 0.04em;
-          white-space: nowrap;
         }
-        .cw-chip:hover {
-          border-color: ${gold};
-          color: ${gold};
-          background: ${goldBg};
+        .cw-clear-btn:hover { border-color: ${gold}; color: ${gold}; }
+
+        /* ── Messages ── */
+        .cw-messages {
+          flex: 1; overflow-y: auto; padding: 16px 14px;
+          display: flex; flex-direction: column; gap: 14px;
+          scrollbar-width: none; background: ${bg};
         }
-        .cw-clear-btn {
+        .cw-msg-row {
+          display: flex; align-items: flex-end; gap: 8px;
+        }
+        .cw-msg-row.user { flex-direction: row-reverse; }
+
+        /* Avatar */
+        .cw-msg-avatar {
+          width: 28px; height: 28px; border-radius: 50%;
+          background: ${surface}; border: 0.5px solid ${border};
+          display: flex; align-items: center; justify-content: center;
+          font-size: 11px; font-weight: 500;
+          color: ${muted}; flex-shrink: 0;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .cw-msg-avatar.bot {
+          background: ${goldLight}; border-color: ${goldBorder}; color: ${gold};
+        }
+
+        /* Bubble wrapper */
+        .cw-msg-content {
+          max-width: 74%; display: flex; flex-direction: column; gap: 3px;
+        }
+        .cw-msg-row.user .cw-msg-content { align-items: flex-end; }
+
+        /* Bubble */
+        .cw-bubble {
+          padding: 10px 14px;
+          font-size: 13.5px; line-height: 1.65;
+          font-family: 'DM Sans', sans-serif;
+          word-break: break-word;
+        }
+        .cw-bubble.bot {
+          background: ${botBubbleBg};
+          color: ${textMain};
+          border-radius: 4px 18px 18px 18px;
+          border: 0.5px solid ${border};
+        }
+        .cw-bubble.user {
+          background: ${userBubbleBg};
+          color: ${userBubbleText};
+          border-radius: 18px 4px 18px 18px;
+          font-weight: 500;
+        }
+
+        /* Timestamp */
+        .cw-time {
+          font-size: 10px; color: ${muted};
+          padding: 0 4px; letter-spacing: 0.04em;
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Typing dots */
+        .cw-typing {
+          display: flex; align-items: center; gap: 5px;
+          padding: 13px 16px;
+          background: ${botBubbleBg};
+          border: 0.5px solid ${border};
+          border-radius: 4px 18px 18px 18px;
+          width: fit-content;
+        }
+        .cw-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: ${muted};
+          animation: cwBounce 1.1s infinite;
+        }
+        .cw-dot:nth-child(2) { animation-delay: 0.18s; }
+        .cw-dot:nth-child(3) { animation-delay: 0.36s; }
+
+        /* ── Suggestions ── */
+        .cw-chips {
+          padding: 10px 14px;
+          display: flex; flex-wrap: wrap; gap: 7px;
+          border-top: 0.5px solid ${border};
+          background: ${bg}; flex-shrink: 0;
+        }
+        .cw-chip {
+          padding: 6px 13px;
           background: transparent;
-          border: 0.5px solid rgba(255,255,255,0.15);
-          color: rgba(255,255,255,0.45);
-          padding: 5px 12px; font-size: 10px;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: all 0.18s ease; border-radius: 1px;
+          border: 0.5px solid ${border};
+          color: ${muted};
+          font-size: 12px; cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          border-radius: 20px;
+          transition: all 0.18s ease;
+          letter-spacing: 0.02em; white-space: nowrap;
         }
-        .cw-clear-btn:hover {
-          border-color: rgba(255,255,255,0.35);
-          color: rgba(255,255,255,0.8);
+        .cw-chip:hover { border-color: ${gold}; color: ${gold}; background: ${goldLight}; }
+
+        /* ── Input row ── */
+        .cw-input-row {
+          padding: 10px 12px 14px;
+          border-top: 0.5px solid ${border};
+          background: ${isDark ? 'rgba(255,255,255,0.01)' : 'rgba(26,24,20,0.01)'};
+          display: flex; gap: 9px; align-items: flex-end; flex-shrink: 0;
+        }
+        .cw-textarea {
+          flex: 1; padding: 10px 15px;
+          border: 0.5px solid ${inputBorder};
+          background: ${surface};
+          color: ${textMain};
+          font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+          resize: none; outline: none; line-height: 1.5;
+          max-height: 80px; overflow-y: auto; scrollbar-width: none;
+          transition: border-color 0.2s ease;
+          border-radius: 22px;
+          letter-spacing: 0.01em;
+        }
+        .cw-textarea::placeholder { color: ${muted}; }
+        .cw-textarea:focus { border-color: ${gold}; }
+
+        /* Send button */
+        .cw-send-btn {
+          width: 38px; height: 38px; border-radius: 50%;
+          border: none; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0; font-size: 16px;
+          transition: all 0.2s ease;
+        }
+        .cw-send-btn.active {
+          background: ${gold}; color: #1a1200;
+        }
+        .cw-send-btn.active:hover {
+          transform: scale(1.08);
+          box-shadow: 0 4px 14px rgba(201,168,76,0.4);
+        }
+        .cw-send-btn.inactive {
+          background: ${surface}; color: ${muted};
+          cursor: not-allowed;
+          border: 0.5px solid ${border};
+        }
+
+        @media (max-width: 480px) {
+          .cw-window { width: calc(100vw - 24px); right: 12px; bottom: 88px; }
+          .cw-fab    { bottom: 20px; right: 16px; }
         }
       `}</style>
 
-      {/* FAB */}
-      <div className="cw-fab" onClick={() => setIsOpen(p => !p)}>
+      {/* ── FAB ── */}
+      <div className="cw-fab" onClick={() => setIsOpen(p => !p)} role="button" aria-label="Open chat">
         {isOpen
-          ? <span style={{ fontSize: 14, color: muted, fontFamily: 'DM Sans, sans-serif' }}>✕</span>
-          : <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
-                stroke={gold} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+            </svg>
+          )
         }
         {unread > 0 && !isOpen && (
-          <div style={{
-            position: 'absolute', top: -5, right: -5,
-            background: gold, color: '#0a0a0a',
-            width: 18, height: 18, borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 9, fontWeight: 700, fontFamily: 'DM Sans, sans-serif'
-          }}>
-            {unread}
-          </div>
+          <div className="cw-badge">{unread}</div>
         )}
       </div>
 
-      {/* Chat window */}
+      {/* ── Chat window ── */}
       {isOpen && (
-        <div style={{
-          position: 'fixed', bottom: 92, right: 28, zIndex: 9998,
-          width: 360, height: 520,
-          background: windowBg,
-          border: `0.5px solid ${border}`,
-          boxShadow: isDark
-            ? '0 32px 80px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(201,168,76,0.1)'
-            : '0 20px 60px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(201,168,76,0.15)',
-          display: 'flex', flexDirection: 'column',
-          overflow: 'hidden',
-          animation: 'cwSlide 0.25s ease',
-          borderRadius: '1px'
-        }}>
+        <div className="cw-window">
 
           {/* Header */}
-          <div style={{
-            padding: '14px 18px',
-            background: '#111110',
-            borderBottom: `0.5px solid rgba(201,168,76,0.15)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            flexShrink: 0, position: 'relative', overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0,
-              width: '2px', background: gold
-            }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 36, height: 36,
-                border: `0.5px solid ${goldBorder}`,
-                background: goldBg,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, borderRadius: '1px'
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="11" width="18" height="10" rx="2"
-                    stroke={gold} strokeWidth="1.5" strokeLinecap="round" />
-                  <path d="M12 3v4M9 7h6" stroke={gold} strokeWidth="1.5" strokeLinecap="round" />
-                  <circle cx="9" cy="16" r="1" fill={gold} />
-                  <circle cx="15" cy="16" r="1" fill={gold} />
-                </svg>
-              </div>
-              <div>
-                <p style={{
-                  color: '#e8e4dc', fontWeight: 400, margin: 0,
-                  fontSize: 13, letterSpacing: '0.03em',
-                  fontFamily: 'DM Sans, sans-serif'
-                }}>
-                  Cartify Assistant
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
-                  <div style={{
-                    width: 5, height: 5, borderRadius: '50%',
-                    background: '#a8c080',
-                    boxShadow: '0 0 4px rgba(168,192,128,0.6)'
-                  }} />
-                  <span style={{
-                    color: 'rgba(255,255,255,0.35)', fontSize: 10,
-                    letterSpacing: '0.08em', fontFamily: 'DM Sans, sans-serif'
-                  }}>
-                    Online
-                  </span>
-                </div>
+          <div className="cw-header">
+            <div className="cw-header-avatar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" />
+                <path d="M12 3v4M9 7h6" />
+                <circle cx="9" cy="16" r="1" fill={gold} stroke="none" />
+                <circle cx="15" cy="16" r="1" fill={gold} stroke="none" />
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <p className="cw-header-name">Cartify Assistant</p>
+              <div className="cw-header-sub">
+                <div className="cw-status-dot" />
+                <span className="cw-status-text">Online · replies instantly</span>
               </div>
             </div>
             <button className="cw-clear-btn" onClick={clearChat}>Clear</button>
           </div>
 
           {/* Messages */}
-          <div style={{
-            flex: 1, overflowY: 'auto', padding: '14px 14px',
-            display: 'flex', flexDirection: 'column', gap: 12,
-            scrollbarWidth: 'none', background: windowBg
-          }}>
+          <div className="cw-messages">
             {messages.map((msg, i) => {
               const isBot = msg.role === 'model'
               return (
-                <div key={i} style={{
-                  display: 'flex',
-                  flexDirection: isBot ? 'row' : 'row-reverse',
-                  alignItems: 'flex-end', gap: 8
-                }}>
-                  {/* Avatar */}
-                  <div style={{
-                    width: 28, height: 28, flexShrink: 0,
-                    border: `0.5px solid ${isBot ? goldBorder : border}`,
-                    background: isBot ? goldBg : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(26,24,20,0.04)'),
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 11, fontWeight: 500,
-                    color: isBot ? gold : muted,
-                    borderRadius: '1px', fontFamily: 'DM Sans, sans-serif'
-                  }}>
-                    {isBot ? '◈' : (userHasName ? userInitial : '?')}
+                <div key={i} className={`cw-msg-row${isBot ? '' : ' user'}`}>
+                  <div className={`cw-msg-avatar${isBot ? ' bot' : ''}`}>
+                    {isBot ? '◈' : userInitial}
                   </div>
-
-                  {/* Bubble */}
-                  <div style={{
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: isBot ? 'flex-start' : 'flex-end',
-                    maxWidth: '78%', gap: 3
-                  }}>
-                    <div style={{
-                      padding: '10px 13px',
-                      background: isBot ? botBg : (isDark ? '#1e1c18' : '#1a1814'),
-                      color: isBot ? textMain : (isDark ? '#e8e4dc' : '#f5f2ec'),
-                      fontSize: 13, lineHeight: 1.65,
-                      border: `0.5px solid ${isBot ? border : (isDark ? 'rgba(201,168,76,0.1)' : 'rgba(26,24,20,0.15)')}`,
-                      borderRadius: '1px',
-                      fontFamily: 'DM Sans, sans-serif',
-                      letterSpacing: '0.01em'
-                    }}>
+                  <div className="cw-msg-content">
+                    <div className={`cw-bubble ${isBot ? 'bot' : 'user'}`}>
                       {isBot
                         ? <MessageContent text={msg.text} onNavigate={handleNavigate} />
                         : msg.text
                       }
                     </div>
-                    <span style={{
-                      fontSize: 9, color: muted,
-                      letterSpacing: '0.06em',
-                      fontFamily: 'DM Sans, sans-serif',
-                      paddingLeft: 2, paddingRight: 2
-                    }}>
-                      {msg.time}
-                    </span>
+                    <span className="cw-time">{msg.time}</span>
                   </div>
                 </div>
               )
             })}
 
-            {/* Typing dots */}
+            {/* Typing indicator */}
             {loading && (
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
-                <div style={{
-                  width: 28, height: 28,
-                  border: `0.5px solid ${goldBorder}`,
-                  background: goldBg,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, color: gold, borderRadius: '1px'
-                }}>◈</div>
-                <div style={{
-                  padding: '10px 14px',
-                  background: botBg,
-                  border: `0.5px solid ${border}`,
-                  display: 'flex', gap: 4, alignItems: 'center',
-                  borderRadius: '1px'
-                }}>
-                  {[0, 1, 2].map(j => (
-                    <div key={j} style={{
-                      width: 5, height: 5, borderRadius: '50%',
-                      background: gold, opacity: 0.6,
-                      animation: `cwBounce 1s infinite ${j * 0.18}s`
-                    }} />
-                  ))}
+              <div className="cw-msg-row">
+                <div className="cw-msg-avatar bot">◈</div>
+                <div className="cw-typing">
+                  <div className="cw-dot" />
+                  <div className="cw-dot" />
+                  <div className="cw-dot" />
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestion chips */}
+          {/* Suggestion chips — show only at the start */}
           {messages.length <= 2 && (
-            <div style={{
-              padding: '0 14px 10px',
-              display: 'flex', flexWrap: 'wrap', gap: 5,
-              flexShrink: 0, background: windowBg,
-              borderTop: `0.5px solid ${border}`
-            }}>
-              <div style={{ width: '100%', paddingTop: '10px' }} />
+            <div className="cw-chips">
               {suggestions.map((s, i) => (
-                <button key={i} className="cw-chip"
-                  onClick={() => { setInput(s); inputRef.current?.focus() }}>
+                <button
+                  key={i}
+                  className="cw-chip"
+                  onClick={() => { setInput(s); inputRef.current?.focus() }}
+                >
                   {s}
                 </button>
               ))}
@@ -449,12 +520,7 @@ const ChatWidget = () => {
           )}
 
           {/* Input */}
-          <div style={{
-            padding: '10px 13px 13px',
-            borderTop: `0.5px solid ${border}`,
-            background: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(26,24,20,0.01)',
-            display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0
-          }}>
+          <div className="cw-input-row">
             <textarea
               ref={inputRef}
               value={input}
@@ -465,17 +531,10 @@ const ChatWidget = () => {
               className="cw-textarea"
             />
             <button
-              className="cw-send-btn"
+              className={`cw-send-btn ${input.trim() && !loading ? 'active' : 'inactive'}`}
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              style={{
-                borderColor: input.trim() && !loading ? gold : border,
-                color: input.trim() && !loading ? gold : muted,
-                background: input.trim() && !loading ? goldBg : 'transparent',
-                cursor: !input.trim() || loading ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={e => { if (input.trim() && !loading) { e.currentTarget.style.background = gold; e.currentTarget.style.color = '#0a0a0a' }}}
-              onMouseLeave={e => { if (input.trim() && !loading) { e.currentTarget.style.background = goldBg; e.currentTarget.style.color = gold }}}
+              aria-label="Send message"
             >
               ↑
             </button>

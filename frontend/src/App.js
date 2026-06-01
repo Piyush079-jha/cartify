@@ -54,12 +54,12 @@ function App() {
   // no need to pass isDark as a prop to every single component.
   useEffect(() => {
     if (isDark) {
-      document.body.style.background = 'linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%)'
-      document.body.style.color = '#fff'
+      document.body.style.background = '#0e0e0e'
+      document.body.style.color = '#e8e4dc'
       document.body.style.transition = 'all 0.3s ease'
     } else {
-      document.body.style.background = 'linear-gradient(180deg, #ffffff 0%, #f9f9fb 100%)'
-      document.body.style.color = '#111'
+      document.body.style.background = '#faf9f7'
+      document.body.style.color = '#1a1814'
       document.body.style.transition = 'all 0.3s ease'
     }
   }, [isDark])
