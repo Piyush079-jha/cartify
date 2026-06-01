@@ -26,55 +26,63 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
 
     useEffect(() => { fetchData() }, [])
 
-    // Clean dark mode — no purple tints, just dark backgrounds and light text
-    const wrapperBg   = isDark ? '#1a1a1a' : 'transparent'
-    const cardBg      = isDark ? '#2a2a2a' : '#fff'
-    const cardBorder  = isDark ? '#3a3a3a' : '#f0f0f5'
-    const skeletonBg  = isDark ? '#333333' : '#f0f0f5'
-    const textPrimary = isDark ? '#f0f0f0' : '#1a1a2e'
-    const textMuted   = isDark ? '#888888' : '#bbb'
-    const headingColor = isDark ? '#f0f0f0' : '#111'
-    const imageBg     = isDark ? '#222222' : 'linear-gradient(135deg, #fafafa 0%, #f2f2f2 100%)'
+    const gold        = '#c9a84c'
+    const goldDark    = '#b8953e'
+    const wrapperBg   = isDark ? '#0e0e0e' : 'transparent'
+    const cardBg      = isDark ? '#161616' : '#ffffff'
+    const cardBorder  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,20,0.08)'
+    const skeletonBg  = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(26,24,20,0.04)'
+    const textPrimary = isDark ? '#e8e4dc' : '#1a1814'
+    const textMuted   = isDark ? 'rgba(160,152,144,0.8)' : 'rgba(130,125,118,0.9)'
+    const imageBg     = isDark ? 'rgba(255,255,255,0.02)' : '#f7f6f4'
 
     return (
         <div style={{
             background: wrapperBg,
-            borderRadius: '20px',
-            padding: isDark ? '24px' : '0',
+            padding: '32px 0',
             transition: 'all 0.3s ease'
         }}>
             {/* Header */}
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '24px' }}>
                 <h2 style={{
-                    fontSize: '22px', fontWeight: 700, color: headingColor,
-                    margin: '0 0 8px', letterSpacing: '-0.5px'
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: '24px', fontWeight: 300,
+                    color: textPrimary, margin: '0 0 10px',
+                    letterSpacing: '-0.01em'
                 }}>
                     {heading}
                 </h2>
                 <div style={{
-                    width: '50px', height: '3px',
-                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '2px'
+                    width: '40px', height: '0.5px',
+                    background: `linear-gradient(90deg, ${gold}, transparent)`,
                 }} />
             </div>
 
             {/* Grid */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '16px'
             }}>
                 {loading ? (
                     loadingList.map((_, i) => (
                         <div key={i} style={{
-                            background: cardBg, borderRadius: '16px', overflow: 'hidden', opacity: 0.6,
-                            border: `1px solid ${cardBorder}`
+                            background: cardBg, overflow: 'hidden',
+                            border: `0.5px solid ${cardBorder}`,
+                            animation: 'cwpPulse 1.8s ease-in-out infinite',
+                            animationDelay: `${i * 0.08}s`
                         }}>
-                            <div style={{ height: '190px', background: skeletonBg }} />
-                            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                <div style={{ height: '14px', background: skeletonBg, borderRadius: '6px' }} />
-                                <div style={{ height: '12px', background: skeletonBg, borderRadius: '5px', width: '55%' }} />
-                                <div style={{ height: '38px', background: skeletonBg, borderRadius: '10px' }} />
+                            <style>{`
+                                @keyframes cwpPulse {
+                                    0%, 100% { opacity: 0.65; }
+                                    50% { opacity: 0.25; }
+                                }
+                            `}</style>
+                            <div style={{ height: '180px', background: skeletonBg }} />
+                            <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ height: '12px', background: skeletonBg }} />
+                                <div style={{ height: '10px', background: skeletonBg, width: '55%' }} />
+                                <div style={{ height: '36px', background: skeletonBg }} />
                             </div>
                         </div>
                     ))
@@ -88,17 +96,17 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
                             <div
                                 key={product?._id}
                                 style={{
-                                    background: cardBg, borderRadius: '16px',
-                                    overflow: 'hidden', position: 'relative',
-                                    border: `1px solid ${cardBorder}`,
-                                    transition: 'all 0.25s ease'
+                                    background: cardBg, overflow: 'hidden',
+                                    position: 'relative',
+                                    border: `0.5px solid ${cardBorder}`,
+                                    transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease'
                                 }}
                                 onMouseEnter={e => {
                                     e.currentTarget.style.transform = 'translateY(-4px)'
                                     e.currentTarget.style.boxShadow = isDark
-                                        ? '0 12px 32px rgba(0,0,0,0.5)'
-                                        : '0 12px 32px rgba(0,0,0,0.12)'
-                                    e.currentTarget.style.borderColor = isDark ? '#555' : '#ccc'
+                                        ? '0 12px 40px rgba(0,0,0,0.4)'
+                                        : '0 12px 40px rgba(26,24,20,0.1)'
+                                    e.currentTarget.style.borderColor = gold
                                 }}
                                 onMouseLeave={e => {
                                     e.currentTarget.style.transform = 'translateY(0)'
@@ -109,11 +117,11 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
                                 {/* Discount Badge */}
                                 {discount && (
                                     <div style={{
-                                        position: 'absolute', top: '12px', right: '12px', zIndex: 2,
-                                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                                        color: '#fff', fontSize: '10px', fontWeight: 700,
-                                        padding: '4px 9px', borderRadius: '8px',
-                                        boxShadow: '0 3px 10px rgba(245,87,108,0.3)'
+                                        position: 'absolute', top: '10px', right: '10px', zIndex: 2,
+                                        background: 'rgba(201,168,76,0.12)',
+                                        color: gold, fontSize: '9px', fontWeight: 500,
+                                        padding: '3px 8px', letterSpacing: '0.08em',
+                                        border: `0.5px solid rgba(201,168,76,0.25)`
                                     }}>
                                         {discount}% OFF
                                     </div>
@@ -122,21 +130,20 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
                                 {/* Image */}
                                 <Link to={"/product/" + product?._id} onClick={scrollTop} style={{ textDecoration: 'none' }}>
                                     <div style={{
-                                        height: '190px',
-                                        background: imageBg,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        padding: '20px', overflow: 'hidden'
+                                        height: '180px', background: imageBg,
+                                        display: 'flex', alignItems: 'center',
+                                        justifyContent: 'center', padding: '20px', overflow: 'hidden'
                                     }}>
                                         <img
                                             src={product.productImage[0]}
                                             alt={product.productName}
                                             style={{
-                                                maxHeight: '150px', maxWidth: '100%',
+                                                maxHeight: '140px', maxWidth: '100%',
                                                 objectFit: 'contain',
                                                 mixBlendMode: isDark ? 'lighten' : 'multiply',
-                                                transition: 'transform 0.3s ease'
+                                                transition: 'transform 0.35s ease'
                                             }}
-                                            onMouseEnter={e => e.target.style.transform = 'scale(1.08)'}
+                                            onMouseEnter={e => e.target.style.transform = 'scale(1.06)'}
                                             onMouseLeave={e => e.target.style.transform = 'scale(1)'}
                                         />
                                     </div>
@@ -146,33 +153,34 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
                                 <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                     <Link to={"/product/" + product?._id} onClick={scrollTop} style={{ textDecoration: 'none' }}>
                                         <h3 style={{
-                                            fontSize: '14px', fontWeight: 600, color: textPrimary,
+                                            fontSize: '13px', fontWeight: 400, color: textPrimary,
                                             margin: 0, overflow: 'hidden', textOverflow: 'ellipsis',
                                             display: '-webkit-box', WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical', lineHeight: '1.45', minHeight: '40px'
+                                            WebkitBoxOrient: 'vertical', lineHeight: '1.5',
+                                            minHeight: '39px', letterSpacing: '0.01em'
                                         }}>
                                             {product?.productName}
                                         </h3>
                                     </Link>
 
                                     <p style={{
-                                        fontSize: '11px', color: '#667eea',
-                                        fontWeight: 600, margin: 0, textTransform: 'capitalize'
+                                        fontSize: '10px', color: gold, fontWeight: 500,
+                                        margin: 0, textTransform: 'capitalize',
+                                        letterSpacing: '0.08em'
                                     }}>
                                         {product?.category}
                                     </p>
 
                                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '4px 0' }}>
                                         <span style={{
-                                            fontSize: '17px', fontWeight: 800,
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                                            backgroundClip: 'text'
+                                            fontFamily: "'Cormorant Garamond', Georgia, serif",
+                                            fontSize: '20px', fontWeight: 300, color: textPrimary,
+                                            letterSpacing: '-0.02em'
                                         }}>
                                             {displayINRCurrency(product?.sellingPrice)}
                                         </span>
                                         {product?.price !== product?.sellingPrice && (
-                                            <span style={{ fontSize: '12px', color: textMuted, textDecoration: 'line-through' }}>
+                                            <span style={{ fontSize: '11px', color: textMuted, textDecoration: 'line-through' }}>
                                                 {displayINRCurrency(product?.price)}
                                             </span>
                                         )}
@@ -181,21 +189,28 @@ const CategroyWiseProductDisplay = ({ category, heading, isDark = false }) => {
                                     <button
                                         onClick={(e) => handleAddToCart(e, product?._id)}
                                         style={{
-                                            width: '100%', padding: '10px', borderRadius: '12px',
-                                            border: 'none',
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            color: '#fff', fontSize: '13px', fontWeight: 600,
-                                            cursor: 'pointer',
-                                            boxShadow: '0 4px 14px rgba(102,126,234,0.28)',
-                                            transition: 'all 0.2s'
+                                            width: '100%', padding: '10px',
+                                            border: `0.5px solid ${gold}`,
+                                            background: gold,
+                                            color: '#0a0a0a', fontSize: '10px', fontWeight: 500,
+                                            cursor: 'pointer', letterSpacing: '0.12em',
+                                            textTransform: 'uppercase',
+                                            fontFamily: "'DM Sans', sans-serif",
+                                            borderRadius: '1px',
+                                            boxShadow: '0 0 20px rgba(201,168,76,0.15)',
+                                            transition: 'all 0.22s ease'
                                         }}
                                         onMouseEnter={e => {
+                                            e.currentTarget.style.background = goldDark
+                                            e.currentTarget.style.borderColor = goldDark
                                             e.currentTarget.style.transform = 'translateY(-1px)'
-                                            e.currentTarget.style.boxShadow = '0 6px 18px rgba(102,126,234,0.45)'
+                                            e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,168,76,0.28)'
                                         }}
                                         onMouseLeave={e => {
+                                            e.currentTarget.style.background = gold
+                                            e.currentTarget.style.borderColor = gold
                                             e.currentTarget.style.transform = 'translateY(0)'
-                                            e.currentTarget.style.boxShadow = '0 4px 14px rgba(102,126,234,0.28)'
+                                            e.currentTarget.style.boxShadow = '0 0 20px rgba(201,168,76,0.15)'
                                         }}
                                     >
                                         Add to Cart
